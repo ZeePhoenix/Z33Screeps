@@ -1,19 +1,39 @@
-Creep.prototype.moveZ = function moveZ(t, display){
-	if (display) {
-		this.moveTo(t, {visualizePathStyle: {stroke: '#fff'}});
+Creep.prototype.moveZ = function moveZ(t){
+	if (this.debug) {
+		this.moveTo(t, {visualizePathStyle: {stroke: '#ffaa00'}});
 	} else {
 		this.moveTo(t);
 	}
 }
 
 Creep.prototype.getEnergy = function getEnergy(){
-	let source = Game.getObjectById(this.memory.source) || this.pos.findClosestByPath(FIND_SOURCES_ACTIVE);
-	this.memory.source = source.id;
-	if(this.harvest(source) == ERR_NOT_IN_RANGE) {
-		this.moveZ(source, true);
+	let storedSource = Game.getObjectById(this.memory.source);
+
+	if (!storedSource && (!storedSource.pos.getOpenPositions().length || !this.pos.isNearTo(storedSource))){
+		delete this.memory.source;
+		storedSource = this.findEnergySource();
+	} 
+
+	if (storedSource){
+		if (this.pos.isNearTo(storedSource)){
+			this.harvest(storedSource);
+		} else {
+			this.moveZ(storedSource);
+		}
 	}
 }
 
-Creep.prototype.speaking = function speaking(){
-	return false;
+Creep.prototype.findEnergySource = function findEnergySource(){
+	let sources = this.room.find(FIND_SOURCES_ACTIVE);
+	if (sources.length){
+		let source = _.find(sources, function(s){
+			return s.pos.getOpenPositions().length > 0;
+		});
+		if (source) {
+			this.memory.source = source.id;
+			return source;
+		}
+	}
 }
+
+Creep.prototype.debug = true;

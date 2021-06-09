@@ -4,11 +4,9 @@ var harvester = {
     run: function(creep){
 		if (creep.memory.working && creep.store[RESOURCE_ENERGY] == 0){
 			creep.memory.working = false;
-			if (creep.speaking()) { creep.say('Done Work'); }
 		}
 		if(!creep.memory.working && creep.store.getFreeCapacity() == 0){
 			creep.memory.working = true;
-			if (creep.speaking()) { creep.say('Time to Work'); }
 		}
 
 		if (creep.memory.working){
@@ -45,9 +43,8 @@ var harvester = {
     // returns an object with the data to spawn a new creep
     spawnData: function(room) {
             let name = 'Harvester' + Game.time;
-            let body = [WORK, CARRY, MOVE, MOVE];
+            var body = [WORK, CARRY, MOVE, MOVE];
             let memory = {role: 'harvester'};
-        
             return {name, body, memory};
     }
 };

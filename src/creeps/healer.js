@@ -4,11 +4,9 @@ var roleHealer = {
     run: function(creep){
 		if (creep.memory.working && creep.store[RESOURCE_ENERGY] == 0){
 			creep.memory.working = false;
-			if (creep.speaking()) { creep.say('Done Work'); }
 		}
 		if(!creep.memory.working && creep.store.getFreeCapacity() == 0){
 			creep.memory.working = true;
-			if (creep.speaking()) { creep.say('Time to Work'); }
 		}
 
 		if (creep.memory.working){
@@ -38,7 +36,7 @@ var roleHealer = {
         var healers = _.filter(Game.creeps, (creep) => creep.memory.role == 'healer' && creep.room.name == room.name);
         var extensions = _.filter(Game.structures, (struct) => struct.structureType == STRUCTURE_EXTENSION && struct.room.name == room.name);
 		console.log('Healers: ' + healers.length, room.name);
-		switch (extensions){
+		switch (extensions.length){
 			case 5:
 			case 4:
 			case 3:
