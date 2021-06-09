@@ -49,7 +49,7 @@ function __getDirname(path) {
 	return require("path").resolve(__dirname + "/" + path + "/../");
 }
 /********** End of header **********/
-/********** Start module 0: C:\Users\Ayden Rennaker\Desktop\Starter Codebase\src\main.js **********/
+/********** Start module 0: D:\git\Z33Screeps\src\main.js **********/
 __modules[0] = function(module, exports) {
 let creepLogic = __require(1,0);
 let roomLogic = __require(2,0);
@@ -76,8 +76,8 @@ module.exports.loop = function () {
 }
 return module.exports;
 }
-/********** End of module 0: C:\Users\Ayden Rennaker\Desktop\Starter Codebase\src\main.js **********/
-/********** Start module 1: C:\Users\Ayden Rennaker\Desktop\Starter Codebase\src\creeps\index.js **********/
+/********** End of module 0: D:\git\Z33Screeps\src\main.js **********/
+/********** Start module 1: D:\git\Z33Screeps\src\creeps\index.js **********/
 __modules[1] = function(module, exports) {
 let creepLogic = {
     harvester:     __require(4,1),
@@ -87,8 +87,8 @@ let creepLogic = {
 module.exports = creepLogic;
 return module.exports;
 }
-/********** End of module 1: C:\Users\Ayden Rennaker\Desktop\Starter Codebase\src\creeps\index.js **********/
-/********** Start module 2: C:\Users\Ayden Rennaker\Desktop\Starter Codebase\src\room\index.js **********/
+/********** End of module 1: D:\git\Z33Screeps\src\creeps\index.js **********/
+/********** Start module 2: D:\git\Z33Screeps\src\room\index.js **********/
 __modules[2] = function(module, exports) {
 let roomLogic = {
     spawning:     __require(6,2),
@@ -97,32 +97,30 @@ let roomLogic = {
 module.exports = roomLogic;
 return module.exports;
 }
-/********** End of module 2: C:\Users\Ayden Rennaker\Desktop\Starter Codebase\src\room\index.js **********/
-/********** Start module 3: C:\Users\Ayden Rennaker\Desktop\Starter Codebase\src\prototypes\index.js **********/
+/********** End of module 2: D:\git\Z33Screeps\src\room\index.js **********/
+/********** Start module 3: D:\git\Z33Screeps\src\prototypes\index.js **********/
 __modules[3] = function(module, exports) {
 let files = {
     creep: __require(7,3)
 }
 return module.exports;
 }
-/********** End of module 3: C:\Users\Ayden Rennaker\Desktop\Starter Codebase\src\prototypes\index.js **********/
-/********** Start module 4: C:\Users\Ayden Rennaker\Desktop\Starter Codebase\src\creeps\harvester.js **********/
+/********** End of module 3: D:\git\Z33Screeps\src\prototypes\index.js **********/
+/********** Start module 4: D:\git\Z33Screeps\src\creeps\harvester.js **********/
 __modules[4] = function(module, exports) {
 var harvester = {
 
     /** @param {Creep} creep **/
     run: function(creep) {
         if(creep.store.getFreeCapacity() > 0) {
-            var sources = creep.room.find(FIND_SOURCES);
-            if(creep.harvest(sources[0]) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(sources[0]);
+            var source = creep.pos.findClosestByPath(FIND_SOURCES_ACTIVE);
+            if(creep.harvest(source) == ERR_NOT_IN_RANGE) {
+                creep.moveZ(source, true);
             }
         }
         else {
-            creep.sayHello();
-            
             if(creep.transfer(Game.spawns['Spawn1'], RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(Game.spawns['Spawn1']);
+                creep.moveZ(Game.spawns['Spawn1'], true);
             }
         }
     },
@@ -136,7 +134,7 @@ var harvester = {
     },
     spawnData: function(room) {
             let name = 'Harvester' + Game.time;
-            let body = [WORK, CARRY, MOVE];
+            let body = [WORK, CARRY, MOVE, MOVE];
             let memory = {role: 'harvester'};
         
             return {name, body, memory};
@@ -146,8 +144,8 @@ var harvester = {
 module.exports = harvester;
 return module.exports;
 }
-/********** End of module 4: C:\Users\Ayden Rennaker\Desktop\Starter Codebase\src\creeps\harvester.js **********/
-/********** Start module 5: C:\Users\Ayden Rennaker\Desktop\Starter Codebase\src\creeps\upgrader.js **********/
+/********** End of module 4: D:\git\Z33Screeps\src\creeps\harvester.js **********/
+/********** Start module 5: D:\git\Z33Screeps\src\creeps\upgrader.js **********/
 __modules[5] = function(module, exports) {
 var roleUpgrader = {
 
@@ -156,12 +154,12 @@ var roleUpgrader = {
         if(creep.store[RESOURCE_ENERGY] == 0) {
             var sources = creep.room.find(FIND_SOURCES);
             if(creep.harvest(sources[0]) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(sources[0]);
+                creep.moveZ(sources[0], true);
             }
         }
         else {
             if(creep.upgradeController(creep.room.controller) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(creep.room.controller);
+                creep.moveZ(creep.room.controller, true);
             }
         }
     },
@@ -185,8 +183,8 @@ var roleUpgrader = {
 module.exports = roleUpgrader;
 return module.exports;
 }
-/********** End of module 5: C:\Users\Ayden Rennaker\Desktop\Starter Codebase\src\creeps\upgrader.js **********/
-/********** Start module 6: C:\Users\Ayden Rennaker\Desktop\Starter Codebase\src\room\spawning.js **********/
+/********** End of module 5: D:\git\Z33Screeps\src\creeps\upgrader.js **********/
+/********** Start module 6: D:\git\Z33Screeps\src\room\spawning.js **********/
 __modules[6] = function(module, exports) {
 let creepLogic = __require(1,6);
 let creepTypes = _.keys(creepLogic);
@@ -210,15 +208,23 @@ function spawnCreeps(room) {
 module.exports = spawnCreeps;
 return module.exports;
 }
-/********** End of module 6: C:\Users\Ayden Rennaker\Desktop\Starter Codebase\src\room\spawning.js **********/
-/********** Start module 7: C:\Users\Ayden Rennaker\Desktop\Starter Codebase\src\prototypes\creep.js **********/
+/********** End of module 6: D:\git\Z33Screeps\src\room\spawning.js **********/
+/********** Start module 7: D:\git\Z33Screeps\src\prototypes\creep.js **********/
 __modules[7] = function(module, exports) {
 Creep.prototype.sayHello = function sayHello() {
     this.say("Hello", true);
 }
+
+Creep.prototype.moveZ = function moveZ(t, display){
+	if (display) {
+		this.moveTo(t, {visualizePathStyle: {stroke: '#fff'}});
+	} else {
+		this.moveTo(t);
+	}
+}
 return module.exports;
 }
-/********** End of module 7: C:\Users\Ayden Rennaker\Desktop\Starter Codebase\src\prototypes\creep.js **********/
+/********** End of module 7: D:\git\Z33Screeps\src\prototypes\creep.js **********/
 /********** Footer **********/
 if(typeof module === "object")
 	module.exports = __require(0);
