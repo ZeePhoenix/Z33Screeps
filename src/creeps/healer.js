@@ -9,20 +9,22 @@ var roleHealer = {
 			creep.memory.working = true;
 		}
 
-		if (creep.memory.working){
+		if (creep.memory.working && !creep.memory.destination){
 			var targets = creep.room.find(FIND_STRUCTURES);
 			let priorities = _.filter(targets, (s) => s.structureType != STRUCTURE_WALL && s.hits < s.hitsMax);
 			if (priorities.length){
-				creep.zMove(creep.pos.findClosestByRange(priorities));
+				creep.zMove(creep.pos.findClosestByRange(priorities), 1);
 			} else {
 				
 				let walls = _.filter(targets, (s) => s.structureType == STRUCTURE_WALL && s.hits < s.hitsMax);
 				for (let p = 0.0001; p <= 1; p += .0001){
 					for (let wall of walls){
-						if (wall.hits / wall.hitsMax < p) { creep.zMove(wall); break; }
+						if (wall.hits / wall.hitsMax < p) { creep.zMove(wall, 1); break; }
 					}
 				}
 			}
+		} else if (creep.memory.working) {
+			creep.zMove(Game.getObjectById(creep.memory.destination), 2);
 		}
 		else {
 			creep.getEnergy();

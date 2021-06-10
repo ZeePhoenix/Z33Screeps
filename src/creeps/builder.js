@@ -20,7 +20,7 @@ var roleBuilder = {
 						target = pTargets[name];
 					}
 				}
-				creep.zMove(target);
+				creep.zMove(target, 2);
 			} else {
 				let bTargets = _.filter(targets, (t) => t.structureType == STRUCTURE_ROAD);
 				var workDone = 0;
@@ -31,7 +31,7 @@ var roleBuilder = {
 						target = targets[name];
 					}
 				}
-				creep.zMove(target);
+				creep.zMove(target, 2);
 			}
 		} else {
 			creep.getEnergy();

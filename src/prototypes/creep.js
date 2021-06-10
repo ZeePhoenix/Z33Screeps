@@ -1,14 +1,23 @@
-Creep.prototype.debug = true;
+Creep.prototype.debug = false;
 
 // Allows for drawing of move path based on debug
-Creep.prototype.zMove = function zMove(t){
-	if(this.pos.isNearTo(t)){
-		this.doJob(t);
-	} else {
-		if (this.debug) {
-			this.moveTo(t, {visualizePathStyle: {stroke: '#ffaa00'}});
+Creep.prototype.zMove = function zMove(t, r){
+	let storedDest = Game.getObjectById(this.memory.destination);
+	if (!storedDest || (!storedDest.pos.getOpenPositions(r).length && !this.pos.inRangeTo(storedDest, r))){
+		delete this.memory.destination;
+		this.memory.destination = t.id;
+		storedDest = t;
+	}
+
+	if (storedDest) {
+		if(this.pos.inRangeTo(storedDest, r)){
+			this.doJob(storedDest);
 		} else {
-			this.moveTo(t);
+			if (this.debug) {
+				this.moveTo(storedDest, {visualizePathStyle: {stroke: '#ffaa00'}});
+			} else {
+				this.moveTo(storedDest);
+			}
 		}
 	}
 }
@@ -26,10 +35,10 @@ Creep.prototype.doJob = function doJob(t){
 // Gets energy for the creep
 Creep.prototype.getEnergy = function getEnergy(){
 	let storedSource = Game.getObjectById(this.memory.source);
-	if (this.memory.role == 'harvester' && (!storedSource || (!storedSource.pos.getOpenPositions().length && !this.pos.isNearTo(storedSource)))){
+	if (this.memory.role == 'harvester' && (!storedSource || (!storedSource.pos.getOpenPositions(1).length && !this.pos.isNearTo(storedSource)))){
 		delete this.memory.source;
 		storedSource = this.findEnergySource();
-	} else if (!storedSource || (!storedSource.pos.getOpenPositions().length && !this.pos.isNearTo(storedSource))){
+	} else if (!storedSource || (!storedSource.pos.getOpenPositions(1).length && !this.pos.isNearTo(storedSource))){
 		delete this.memory.source;
 		storedSource = this.findEnergyStructure();
 	}
@@ -53,7 +62,7 @@ Creep.prototype.findEnergySource = function findEnergySource(){
 	let sources = this.room.find(FIND_SOURCES_ACTIVE);
 	if (sources.length){
 		let source = _.find(sources, function(s){
-			return s.pos.getOpenPositions().length > 0;
+			return s.pos.getOpenPositions(1).length > 0;
 		});
 		if (source) {
 			this.memory.source = source.id;
@@ -65,12 +74,12 @@ Creep.prototype.findEnergySource = function findEnergySource(){
 // Find a structure to get energy from
 Creep.prototype.findEnergyStructure = function findEnergyStructure(){
 	let sources = this.room.find(FIND_MY_STRUCTURES);
-	if (_.filter(sources, (struct) => struct.structureType == STRUCTURE_STORAGE).length == 0) {
+	if (_.filter(sources, (struct) => struct.structureType == STRUCTURE_STORAGE || struct.structureType == STRUCTURE_CONTAINER).length == 0) {
 		return this.findEnergySource()
 	}
 	if (sources.length){
 		let source = _.find(sources, function(s){
-			return (s.pos.getOpenPositions().length > 0 && s.structureType == STRUCTURE_STORAGE);
+			return (s.pos.getOpenPositions(1).length > 0 && (s.structureType == STRUCTURE_STORAGE || s.structureType == STRUCTURE_CONTAINER));
 		});
 		if (source) {
 			this.memory.source = source.id;

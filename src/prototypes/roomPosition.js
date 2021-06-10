@@ -1,11 +1,11 @@
-RoomPosition.prototype.getNearbyPositions = function getNearbyPositions(){
+RoomPosition.prototype.getNearbyPositions = function getNearbyPositions(range){
 	var positions = [];
 
-	let startX = this.x - 1 || 1;
-	let startY = this.y - 1 || 1;
+	let startX = this.x - range || 1;
+	let startY = this.y - range || 1;
 
-	for (x = startX; x <= this.x + 1 && x < 49; x++){
-		for (y = startY; y <= this.y + 1 && y < 49; y++){
+	for (x = startX; x <= this.x + range && x < 49; x++){
+		for (y = startY; y <= this.y + range && y < 49; y++){
 			if (x != this.x || y != this.y) {
 				positions.push(new RoomPosition(x,y,this.roomName));
 			}
@@ -14,8 +14,8 @@ RoomPosition.prototype.getNearbyPositions = function getNearbyPositions(){
 	return positions;
 }
 
-RoomPosition.prototype.getOpenPositions = function getOpenPositions(){
-	let nearbyPositions = this.getNearbyPositions();
+RoomPosition.prototype.getOpenPositions = function getOpenPositions(range){
+	let nearbyPositions = this.getNearbyPositions(range);
 
 	let terrain = Game.map.getRoomTerrain(this.roomName);
 
