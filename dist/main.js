@@ -139,7 +139,7 @@ return module.exports;
 /********** Start module 4: D:\git\Z33Screeps\src\creeps\harvester.js **********/
 __modules[4] = function(module, exports) {
 var harvester = {
-	num: 4,
+	num: 2,
 
     /** @param {Creep} creep **/
     run: function(creep){
@@ -189,7 +189,7 @@ var harvester = {
             let name = 'Harvester' + Game.time;
             var bodySegment = [WORK, CARRY, MOVE];
 			var body = this.getBody(bodySegment, room);
-            let memory = {role: 'harvester', source: false, destination: false};
+            let memory = {role: 'harvester', working: false, destination: false, source: false};
             return {name, body, memory};
     },
 
@@ -217,6 +217,7 @@ var roleUpgrader = {
     run: function(creep) {
 		if (creep.memory.working && creep.store.getUsedCapacity([RESOURCE_ENERGY]) == 0){
 			creep.memory.working = false;
+			creep.memory.source = false;
 		}
 		if (!creep.memory.working && (creep.store.getUsedCapacity([RESOURCE_ENERGY]) == creep.store.getCapacity([RESOURCE_ENERGY]))){
 			creep.memory.working = true;
@@ -244,7 +245,7 @@ var roleUpgrader = {
             let name = 'Upgrader' + Game.time;
             let bodySegment = [WORK, CARRY, MOVE];
 			var body = this.getBody(bodySegment, room);
-            let memory = {role: 'upgrader'};
+            let memory = {role: 'upgrader', working: false, destination: false, source: false};
         
             return {name, body, memory};
     },
@@ -272,35 +273,24 @@ var roleBuilder = {
 
 	/**@param {Creep} creep */
 	run: function(creep){
+		if (!creep.memory.working && creep.store.getFreeCapacity(RESOURCE_ENERGY) > 0){
+			creep.getEnergy();
+		}
 		if (creep.memory.working && creep.store.getUsedCapacity([RESOURCE_ENERGY]) == 0){
 			creep.memory.working = false;
+			creep.memory.source = false;
 		}
-		if (!creep.memory.working && (creep.store.getUsedCapacity([RESOURCE_ENERGY]) == creep.store.getCapacity([RESOURCE_ENERGY]))){
+		if (!creep.memory.working && creep.store.getFreeCapacity(RESOURCE_ENERGY) == 0){
 			creep.memory.working = true;
 			creep.memory.destination = false;
 		}
 
 		if (creep.memory.working && !creep.memory.destination) {
 			let targets = creep.room.find(FIND_MY_CONSTRUCTION_SITES);
-			let prioTargets = _.filter(targets, (t) => t.structureType != STRUCTURE_ROAD);
-			let attempt = _.find(prioTargets, (t) => t.progress > 0);
-			if (attempt != undefined){
-				creep.memory.destination = attempt.id;
-			} else {
-				let bAttempt = _.find(prioTargets, (t) => t.progress == 0);
-				if (bAttempt != undefined) {
-					creep.memory.destination = bAttempt.id;
-				}else {
-					let roadTargets = _.filter(targets, (t) => t.structureType != STRUCTURE_ROAD);
-					let rAttempt = _.find(roadTargets, (t) => t.progress > 0);
-					if (rAttempt != undefined) {
-						creep.memory.destination = rAttempt.id;
-					} else {
-						creep.memory.destination = _.find(targets, (t) => t.progress == 0).id;
-					}
-				}
-			}
-			console.log(creep.memory.destination);
+			let priorityList = [STRUCTURE_EXTENSION, STRUCTURE_CONTAINER, STRUCTURE_WALL, STRUCTURE_RAMPART, STRUCTURE_ROAD];
+			let possible = creep.findPriority(targets, priorityList);
+			console.log(possible);
+			creep.memory.destination = possible;
 		}
 		if (creep.memory.working && creep.memory.destination != false){
 			let workSite = Game.getObjectById(creep.memory.destination);
@@ -327,7 +317,7 @@ var roleBuilder = {
             let name = 'Builder' + Game.time;
             let bodySegment = [WORK, CARRY, MOVE];
 			var body = this.getBody(bodySegment, room);
-            let memory = {role: 'builder', working: false, destination: false};
+            let memory = {role: 'builder', working: false, destination: false, source: false};
         
             return {name, body, memory};
     },
@@ -402,7 +392,7 @@ var roleHealer = {
             let name = 'Healer' + Game.time;
             let bodySegment = [WORK, CARRY, MOVE, MOVE];
 			var body = this.getBody(bodySegment, room);
-            let memory = {role: 'healer'};
+            let memory = {role: 'healer', working: false, destination: false, source: false};
         
             return {name, body, memory};
     },
@@ -490,7 +480,9 @@ Creep.prototype.getEnergy = function getEnergy(){
 			}
 			break;
 		default: 
-			this.findEnergyStructure();
+			if (this.memory.source == false) {
+				this.findEnergyStructure();
+			}
 			gameObj = Game.getObjectById(this.memory.source);
 			if (this.pos.isNearTo(gameObj)){
 				if (gameObj.structureType != undefined){
@@ -525,6 +517,15 @@ Creep.prototype.findEnergyStructure = function findEnergyStructure(){
 		} else {
 			this.findEnergySource();
 		}
+	} else {
+		this.findEnergySource();
+	}
+}
+Creep.prototype.findPriority = function(list, queue){
+	let prio = undefined;
+	for(let i = 0; i < queue.length; i++){
+		prio = _.find(list, (l) => l.structureType == queue[i]);
+		if (prio != undefined){ return prio.id; }
 	}
 }
 return module.exports;
@@ -538,8 +539,8 @@ RoomPosition.prototype.getNearbyPositions = function getNearbyPositions(range){
 	let startX = this.x - range || 1;
 	let startY = this.y - range || 1;
 
-	for (x = startX; x <= this.x + range && x < 49; x++){
-		for (y = startY; y <= this.y + range && y < 49; y++){
+	for (let x = startX; x <= this.x + range && x < 49; x++){
+		for (let y = startY; y <= this.y + range && y < 49; y++){
 			if (x != this.x || y != this.y) {
 				positions.push(new RoomPosition(x,y,this.roomName));
 			}

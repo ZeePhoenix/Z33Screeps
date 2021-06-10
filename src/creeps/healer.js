@@ -59,7 +59,7 @@ var roleHealer = {
             let name = 'Healer' + Game.time;
             let bodySegment = [WORK, CARRY, MOVE, MOVE];
 			var body = this.getBody(bodySegment, room);
-            let memory = {role: 'healer'};
+            let memory = {role: 'healer', working: false, destination: false, source: false};
         
             return {name, body, memory};
     },

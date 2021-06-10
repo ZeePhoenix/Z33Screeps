@@ -47,7 +47,10 @@ Creep.prototype.getEnergy = function getEnergy(){
 			}
 			break;
 		default: 
-			this.findEnergyStructure();
+			//Set our memory source if we need
+			if (this.memory.source == false) {
+				this.findEnergyStructure();
+			}
 			// Get our memory source and Go
 			gameObj = Game.getObjectById(this.memory.source);
 			if (this.pos.isNearTo(gameObj)){
@@ -87,5 +90,19 @@ Creep.prototype.findEnergyStructure = function findEnergyStructure(){
 		} else {
 			this.findEnergySource();
 		}
+	} else {
+		this.findEnergySource();
+	}
+}
+
+// Returns a possible target location based on a list of priorities
+Creep.prototype.findPriority = function(list, queue){
+	// Iterate through the queue
+	// Check each one in order
+	// If we find one, return the priority
+	let prio = undefined;
+	for(let i = 0; i < queue.length; i++){
+		prio = _.find(list, (l) => l.structureType == queue[i]);
+		if (prio != undefined){ return prio.id; }
 	}
 }

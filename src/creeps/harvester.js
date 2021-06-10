@@ -1,5 +1,6 @@
 var harvester = {
-	num: 4,
+	// TODO: this should be programatically decided
+	num: 2,
 
     /** @param {Creep} creep **/
     run: function(creep){
@@ -56,7 +57,7 @@ var harvester = {
             let name = 'Harvester' + Game.time;
             var bodySegment = [WORK, CARRY, MOVE];
 			var body = this.getBody(bodySegment, room);
-            let memory = {role: 'harvester', source: false, destination: false};
+            let memory = {role: 'harvester', working: false, destination: false, source: false};
             return {name, body, memory};
     },
 
