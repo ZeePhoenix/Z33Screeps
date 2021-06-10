@@ -1,16 +1,11 @@
+const creepLogic = require("../creeps");
 const { spawning } = require("../room");
 
 Creep.prototype.debug = true;
 
 // Move to our stored destination, and if in range, do the job
 Creep.prototype.zMove = function zMove(t, r){
-	let storedDest = Game.getObjectById(this.memory.destination);
-	if (!storedDest || (!storedDest.pos.getOpenPositions(r).length && !this.pos.inRangeTo(storedDest, r))){
-		delete this.memory.destination;
-		this.memory.destination = t.id;
-		storedDest = t;
-	}
-
+	let storedDest = Game.getObjectById(t);
 	if (storedDest) {
 		if(this.pos.inRangeTo(storedDest, r)){
 			this.doJob(storedDest);
@@ -36,32 +31,39 @@ Creep.prototype.doJob = function doJob(t){
 
 // Gets energy for the creep
 Creep.prototype.getEnergy = function getEnergy(){
-	let storedSource = Game.getObjectById(this.memory.source);
-	if (this.memory.role == 'harvester' && (!storedSource || (!storedSource.pos.getOpenPositions(1).length && !this.pos.isNearTo(storedSource)))){
-		delete this.memory.source;
-		storedSource = this.findEnergySource();
-	} else if (!storedSource || (!storedSource.pos.getOpenPositions(1).length && !this.pos.isNearTo(storedSource))){
-		delete this.memory.source;
-		storedSource = this.findEnergyStructure();
-	}
-	if (storedSource && storedSource.hits == null){
-		if (this.pos.isNearTo(storedSource)){
-			this.harvest(storedSource);
-		} else {
-			this.moveTo(storedSource);
-		}
-	} else if (storedSource && storedSource.hits != null){
-		if (this.pos.isNearTo(storedSource)){
-			this.withdraw(storedSource, RESOURCE_ENERGY);
-		} else {
-			this.moveTo(storedSource);
-		}
+	let gameObj;
+	switch(this.memory.role) {
+		case 'harvester':
+			//Set our memory source if we need
+			if (this.memory.source == false) {
+				this.findEnergySource();
+			}
+			// Get our memory source and Go
+			gameObj = Game.getObjectById(this.memory.source);
+			if (this.pos.isNearTo(gameObj)){
+				this.harvest(gameObj);
+			} else {
+				this.moveTo(gameObj);
+			}
+			break;
+		default: 
+			this.findEnergyStructure();
+			// Get our memory source and Go
+			gameObj = Game.getObjectById(this.memory.source);
+			if (this.pos.isNearTo(gameObj)){
+				if (gameObj.structureType != undefined){
+					this.withdraw(gameObj, RESOURCE_ENERGY);
+				} else {
+					this.harvest(gameObj);
+				}
+			} else {
+				this.moveTo(gameObj);
+			}
+			break;
 	}
 }
 
 // Find us an energy source
-// TODO make this use the archived Source Data
-// Assign 1 harvester per Source that can drain it fully
 Creep.prototype.findEnergySource = function findEnergySource(){
 	let sources = this.room.find(FIND_SOURCES_ACTIVE);
 	if (sources.length){
@@ -70,24 +72,20 @@ Creep.prototype.findEnergySource = function findEnergySource(){
 		});
 		if (source) {
 			this.memory.source = source.id;
-			return source;
 		}
 	}
 }
 
 // Find a structure to get energy from
 Creep.prototype.findEnergyStructure = function findEnergyStructure(){
-	let sources = this.room.find(FIND_MY_STRUCTURES);
-	if (_.filter(sources, (struct) => struct.structureType == STRUCTURE_STORAGE || struct.structureType == STRUCTURE_CONTAINER).length == 0) {
-		return this.findEnergySource()
-	}
-	if (sources.length){
-		let source = _.find(sources, function(s){
-			return (s.pos.getOpenPositions(1).length > 0 && (s.structureType == STRUCTURE_STORAGE || s.structureType == STRUCTURE_CONTAINER));
-		});
-		if (source) {
+	var sources = this.room.find(FIND_STRUCTURES);
+	sources = _.filter(sources, (struct) => struct.structureType == STRUCTURE_STORAGE || struct.structureType == STRUCTURE_CONTAINER)
+	if (sources.length > 0){
+		let source = _.find(sources, (s) => s.store.getUsedCapacity([RESOURCE_ENERGY]) >= this.store.getCapacity([RESOURCE_ENERGY]));
+		if (source != undefined ){
 			this.memory.source = source.id;
-			return source;
+		} else {
+			this.findEnergySource();
 		}
 	}
 }
