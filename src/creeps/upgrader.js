@@ -3,15 +3,23 @@ var roleUpgrader = {
 
     /** @param {Creep} creep **/
     run: function(creep) {
-		if (creep.memory.working && creep.store[RESOURCE_ENERGY] == 0){
+		// If we are BUILDING and empty, go Mine
+		if (creep.memory.working && creep.store.getUsedCapacity([RESOURCE_ENERGY]) == 0){
 			creep.memory.working = false;
+			//creep.memory.destination = false;
 		}
-		if(!creep.memory.working && creep.store.getFreeCapacity() == 0){
+		// If we are Filling up on Energy and full, go work
+		if (!creep.memory.working && (creep.store.getUsedCapacity([RESOURCE_ENERGY]) == creep.store.getCapacity([RESOURCE_ENERGY]))){
 			creep.memory.working = true;
+			creep.memory.destination = false;
 		}
 
-		if (creep.memory.working){
-			creep.zMove(creep.room.controller, 2);
+		if (creep.memory.working && !creep.memory.destination) {
+			creep.memory.destination = creep.room.controller.id;
+		}
+		// We must need energy
+		if (creep.memory.working && creep.memory.destination != false){
+			creep.zMove(creep.memory.destination, 2);
 		} else {
 			creep.getEnergy();
 		}

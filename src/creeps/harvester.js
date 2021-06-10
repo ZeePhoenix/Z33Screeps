@@ -3,38 +3,41 @@ var harvester = {
 
     /** @param {Creep} creep **/
     run: function(creep){
-		if (creep.memory.working && creep.store[RESOURCE_ENERGY] == 0){
+		// If we are dropping off Energy and empty, go Mine
+		if (creep.memory.working && creep.store.getUsedCapacity([RESOURCE_ENERGY]) == 0){
 			creep.memory.working = false;
+			//creep.memory.destination = false;
 		}
-		if(!creep.memory.working && creep.store.getFreeCapacity([RESOURCE_ENERGY]) == 0){
+		// If we are Filling up on Energy and full, go work
+		if (!creep.memory.working && (creep.store.getUsedCapacity([RESOURCE_ENERGY]) == creep.store.getCapacity([RESOURCE_ENERGY]))){
 			creep.memory.working = true;
+			creep.memory.destination = false;
 		}
-		// If we are to be working but don't have a destination, get one and go
-		if (creep.memory.working && !creep.memory.destination){
-			var targets = creep.room.find(FIND_MY_STRUCTURES);
-			// Only deliver energy to these structures if they need energy
-			targets = _.filter(targets, function(struct){
-				return (struct.structureType == STRUCTURE_STORAGE || struct.structureType == STRUCTURE_EXTENSION 
-					|| struct.structureType == STRUCTURE_SPAWN || struct.structureType == STRUCTURE_CONTAINER)});
-			// We have somewhere to go
-			if(targets.length){
-				var resources = 0;
-				var target;
-				for(let t of targets){
-					if(t.store.getFreeCapacity([RESOURCE_ENERGY]) > resources ){
-						target = t;
-						resources = t.store.getFreeCapacity([RESOURCE_ENERGY]);
-					}
+
+		if (creep.memory.working && !creep.memory.destination) {
+			let targets = creep.room.find(FIND_STRUCTURES);
+			let prioTargets = _.filter(targets, (t) => (t.structureType == STRUCTURE_SPAWN || t.structureType == STRUCTURE_EXTENSION));
+			let attempt = _.find(prioTargets, (t) => t.store.getFreeCapacity([RESOURCE_ENERGY]) > 0);
+			if (attempt != undefined){
+				creep.memory.destination = attempt.id;
+			} else {
+				let secTargets = _.filter(targets, (t) => (t.structureType == STRUCTURE_CONTAINER || t.structureType == STRUCTURE_STORAGE));
+				let bAttempt = _.find(secTargets, (t) => t.store.getFreeCapacity([RESOURCE_ENERGY]) > 0);
+				if (bAttempt != undefined) {
+					creep.memory.destination = bAttempt.id;
 				}
-				// Get it done
-				creep.zMove(target, 1);
+			}
+		}
+		// Ensure our workSite is accurate, and then get to it
+		if (creep.memory.working && creep.memory.destination != false){
+			let workSite = Game.getObjectById(creep.memory.destination);
+			if (workSite.store.getFreeCapacity([RESOURCE_ENERGY]) == 0){
+				creep.memory.destination = false;
+			} else {
+				creep.zMove(workSite.id, 1);
 			}
 		} 
-		// If we already have a destination Go there
-		else if (creep.memory.working && creep.memory.destination){
-			creep.zMove(Game.getObjectById(creep.memory.destination), 1);
-		} 
-		// We must need energy
+		// Otherwise, fill up that gass
 		else {
 			creep.getEnergy();
 		}
@@ -53,7 +56,7 @@ var harvester = {
             let name = 'Harvester' + Game.time;
             var bodySegment = [WORK, CARRY, MOVE];
 			var body = this.getBody(bodySegment, room);
-            let memory = {role: 'harvester', atSource: undefined};
+            let memory = {role: 'harvester', source: false, destination: false};
             return {name, body, memory};
     },
 

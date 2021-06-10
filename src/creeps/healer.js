@@ -1,33 +1,45 @@
 var roleHealer = {
 	num: 1,
+	range: 2,
 
     /** @param {Creep} creep **/
     run: function(creep){
-		if (creep.memory.working && creep.store[RESOURCE_ENERGY] == 0){
+		// If we are BUILDING and empty, go Mine
+		if (creep.memory.working && creep.store.getUsedCapacity([RESOURCE_ENERGY]) == 0){
 			creep.memory.working = false;
+			//creep.memory.destination = false;
 		}
-		if(!creep.memory.working && creep.store.getFreeCapacity() == 0){
+		// If we are Filling up on Energy and full, go work
+		if (!creep.memory.working && (creep.store.getUsedCapacity([RESOURCE_ENERGY]) == creep.store.getCapacity([RESOURCE_ENERGY]))){
 			creep.memory.working = true;
+			creep.memory.destination = false;
 		}
 
-		if (creep.memory.working && !creep.memory.destination){
-			var targets = creep.room.find(FIND_STRUCTURES);
-			let priorities = _.filter(targets, (s) => s.structureType != STRUCTURE_WALL && s.hits < s.hitsMax);
-			if (priorities.length){
-				creep.zMove(creep.pos.findClosestByRange(priorities), 1);
+		if (creep.memory.working && !creep.memory.destination) {
+			let targets = creep.room.find(FIND_STRUCTURES);
+			let prioTargets = _.filter(targets, (t) => t.structureType != STRUCTURE_WALL);
+			let attempt = _.find(prioTargets, (t) => t.hits < t.hitsMax);
+			if (attempt != undefined){
+				creep.memory.destination = attempt.id;
 			} else {
-				
-				let walls = _.filter(targets, (s) => s.structureType == STRUCTURE_WALL && s.hits < s.hitsMax);
-				for (let p = 0.00001; p <= 1; p += .00001){
-					for (let wall of walls){
-						if (wall.hits / wall.hitsMax < p) { creep.zMove(wall, 1); break; }
-					}
+				let secTargets = _.filter(targets, (t) => t.structureType == STRUCTURE_WALL);
+				for(let p = .00001; p < 1; p += .00001){
+					// Get a wall at our current percentage
+					creep.memory.destination = _.find(secTargets, (w) => w.hits/w.hitsMax < p).id;
+					// If there is one, break out of the loop
+					if (creep.memory.destination != undefined || creep.memory.destination != false) { break; }
 				}
 			}
-		} else if (creep.memory.working && creep.memory.destination) {
-			creep.zMove(Game.getObjectById(creep.memory.destination), 2);
 		}
-		else {
+		// We must need energy
+		if (creep.memory.working && creep.memory.destination != false){
+			let workSite = Game.getObjectById(creep.memory.destination);
+			if (workSite.hits == workSite.hitsMax){
+				creep.memory.destination = false;
+			} else {
+				creep.zMove(workSite.id, 1);
+			}
+		} else {
 			creep.getEnergy();
 		}
 	},
