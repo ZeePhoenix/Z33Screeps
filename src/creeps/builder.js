@@ -3,41 +3,51 @@ var roleBuilder = {
 
 	/**@param {Creep} creep */
 	run: function(creep){
-		if (creep.memory.working && creep.store[RESOURCE_ENERGY] == 0){
+		// If we are BUILDING and empty, go Mine
+		if (creep.memory.working && creep.store.getUsedCapacity([RESOURCE_ENERGY]) == 0){
 			creep.memory.working = false;
+			//creep.memory.destination = false;
 		}
-		if(!creep.memory.working && creep.store.getFreeCapacity() == 0){
+		// If we are Filling up on Energy and full, go work
+		if (!creep.memory.working && (creep.store.getUsedCapacity([RESOURCE_ENERGY]) == creep.store.getCapacity([RESOURCE_ENERGY]))){
 			creep.memory.working = true;
+			creep.memory.destination = false;
 		}
 
-		if (creep.memory.working){
-			var targets = creep.room.find(FIND_MY_CONSTRUCTION_SITES);
-			let pTargets = _.filter(targets, (t) => t.structureType != STRUCTURE_ROAD);
-			if (pTargets.length){
-				var workDone = 0;
-				var target;
-				for (var name in pTargets){
-					if (pTargets[name].progress >= workDone) {
-						workDone = pTargets[name].progress;
-						target = pTargets[name];
-					}
-				}
-				creep.zMove(target, 2);
+		if (creep.memory.working && !creep.memory.destination) {
+			let targets = creep.room.find(FIND_MY_CONSTRUCTION_SITES);
+			let prioTargets = _.filter(targets, (t) => t.structureType != STRUCTURE_ROAD);
+			let attempt = _.find(prioTargets, (t) => t.progress > 0);
+			if (attempt != undefined){
+				creep.memory.destination = attempt.id;
 			} else {
-				let bTargets = _.filter(targets, (t) => t.structureType == STRUCTURE_ROAD);
-				var workDone = 0;
-				var target;
-				for (var name in bTargets){
-					if (targets[name].progress >= workDone) {
-						workDone = targets[name].progress;
-						target = targets[name];
+				let bAttempt = _.find(prioTargets, (t) => t.progress == 0);
+				if (bAttempt != undefined) {
+					creep.memory.destination = bAttempt.id;
+				}else {
+					let roadTargets = _.filter(targets, (t) => t.structureType != STRUCTURE_ROAD);
+					let rAttempt = _.find(roadTargets, (t) => t.progress > 0);
+					if (rAttempt != undefined) {
+						creep.memory.destination = rAttempt.id;
+					} else {
+						creep.memory.destination = _.find(targets, (t) => t.progress == 0).id;
 					}
 				}
-				creep.zMove(target, 3);
+			}
+		}
+		// We must need energy
+		if (creep.memory.working && creep.memory.destination != false){
+			// Make sure our destination needs work
+			let workSite = Game.getObjectById(creep.memory.destination);
+			if (workSite.progress == workSite.progressTotal){
+				creep.memory.destination = false;
+			} else {
+				creep.zMove(workSite.id, 2);
 			}
 		} else {
 			creep.getEnergy();
 		}
+
 	},
     // checks if the room needs to spawn a creep
     spawn: function(room) {
@@ -54,7 +64,7 @@ var roleBuilder = {
             let name = 'Builder' + Game.time;
             let bodySegment = [WORK, CARRY, MOVE];
 			var body = this.getBody(bodySegment, room);
-            let memory = {role: 'builder'};
+            let memory = {role: 'builder', working: false, destination: false};
         
             return {name, body, memory};
     },
