@@ -26,6 +26,7 @@ Creep.prototype.doJob = function doJob(t){
 		case 'builder': this.build(t); break;
 		case 'upgrader': this.upgradeController(t); break;
 		case 'healer': this.repair(t); break;
+		case 'miner': console.log(this.name, ' has reached the intended location.'); this.memory.working = true; break;
 	}
 }
 
@@ -50,9 +51,15 @@ Creep.prototype.getEnergy = function getEnergy(){
 			//Set our memory source if we need
 			if (this.memory.source == false) {
 				this.findEnergyStructure();
+				break;
 			}
-			// Get our memory source and Go
 			gameObj = Game.getObjectById(this.memory.source);
+			// Make sure we can get energy from here
+			if (gameObj.energyCapacityAvaliable < this.store.getFreeCapacity([RESOURCE_ENERGY])){
+				this.findEnergyStructure();
+				break;
+			}
+			// Go get our energy
 			if (this.pos.isNearTo(gameObj)){
 				if (gameObj.structureType != undefined){
 					this.withdraw(gameObj, RESOURCE_ENERGY);
@@ -105,4 +112,5 @@ Creep.prototype.findPriority = function(list, queue){
 		prio = _.find(list, (l) => l.structureType == queue[i]);
 		if (prio != undefined){ return prio.id; }
 	}
+	return prio;
 }

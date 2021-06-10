@@ -1,10 +1,11 @@
 var roleBuilder = {
-	num: 2,
+	num: 3,
 
 	/**@param {Creep} creep */
 	run: function(creep){
 		if (!creep.memory.working && creep.store.getFreeCapacity(RESOURCE_ENERGY) > 0){
 			creep.getEnergy();
+			return;
 		}
 
 		// If we are BUILDING and empty, go Mine
@@ -20,20 +21,19 @@ var roleBuilder = {
 
 		if (creep.memory.working && !creep.memory.destination) {
 			// Get our valid targets
-			// TODO: make this poll with resource locations
 			let targets = creep.room.find(FIND_MY_CONSTRUCTION_SITES);
 			let priorityList = [STRUCTURE_EXTENSION, STRUCTURE_CONTAINER, STRUCTURE_WALL, STRUCTURE_RAMPART, STRUCTURE_ROAD];
 			let possible = creep.findPriority(targets, priorityList);
-			console.log(possible);
 			creep.memory.destination = possible;
+			return;
 		}
 		// Let's get to work
 		if (creep.memory.working && creep.memory.destination != false){
 			// Make sure our destination needs work
 			let workSite = Game.getObjectById(creep.memory.destination);
-			if (workSite.progress == workSite.progressTotal){
+			if (workSite == null || workSite.progress == workSite.progreSssTotal){
 				creep.memory.destination = false;
-			} else {
+			} else if (workSite){
 				creep.zMove(workSite.id, 2);
 			}
 		} else {
@@ -54,7 +54,7 @@ var roleBuilder = {
     // returns an object with the data to spawn a new creep
     spawnData: function(room) {
             let name = 'Builder' + Game.time;
-            let bodySegment = [WORK, CARRY, MOVE];
+            let bodySegment = [WORK, CARRY, MOVE, MOVE];
 			var body = this.getBody(bodySegment, room);
             let memory = {role: 'builder', working: false, destination: false, source: false};
         

@@ -58,7 +58,7 @@ let prototypes = __require(3,0);
 module.exports.loop = function () {
 	console.log('---------------- $(Game.time) ---------------------'.replace('$(Game.time)', Game.time));
     Game.myRooms = _.filter(Game.rooms, r => r.controller && r.controller.level > 0 && r.controller.my);
-	if (Game.time % 8 == 0) {
+	if (Game.time % 12 == 0) {
 		_.forEach(Game.myRooms, r => roomLogic.spawning(r));
 	}
 
@@ -91,6 +91,7 @@ let creepLogic = {
     upgrader:      __require(5,1),
 	builder:      __require(6,1),
 	healer:			__require(7,1),
+	miner:			__require(8,1),
 }
 
 module.exports = creepLogic;
@@ -100,7 +101,7 @@ return module.exports;
 /********** Start module 2: D:\git\Z33Screeps\src\room\index.js **********/
 __modules[2] = function(module, exports) {
 let roomLogic = {
-    spawning:     __require(8,2),
+    spawning:     __require(9,2),
 
 	identifySources: function(room){
 		if (!room.memory.resources){
@@ -130,8 +131,8 @@ return module.exports;
 /********** Start module 3: D:\git\Z33Screeps\src\prototypes\index.js **********/
 __modules[3] = function(module, exports) {
 let files = {
-    creep: 	__require(9,3),
-	roomPosition:	__require(10,3),
+    creep: 	__require(10,3),
+	roomPosition:	__require(11,3),
 }
 return module.exports;
 }
@@ -145,6 +146,7 @@ var harvester = {
     run: function(creep){
 		if (creep.memory.working && creep.store.getUsedCapacity([RESOURCE_ENERGY]) == 0){
 			creep.memory.working = false;
+			creep.memory.source = false;
 		}
 		if (!creep.memory.working && (creep.store.getUsedCapacity([RESOURCE_ENERGY]) == creep.store.getCapacity([RESOURCE_ENERGY]))){
 			creep.memory.working = true;
@@ -167,7 +169,7 @@ var harvester = {
 		}
 		if (creep.memory.working && creep.memory.destination != false){
 			let workSite = Game.getObjectById(creep.memory.destination);
-			if (workSite.store.getFreeCapacity([RESOURCE_ENERGY]) == 0){
+			if (workSite == null || workSite.store.getFreeCapacity([RESOURCE_ENERGY]) == 0){
 				creep.memory.destination = false;
 			} else {
 				creep.zMove(workSite.id, 1);
@@ -196,10 +198,15 @@ var harvester = {
 	getBody: function(segment, room){
 		var body = [];
 		let segmentCost = _.sum(segment, s => BODYPART_COST[s]);
+		let harvesters = _.filter(room.creeps, (c) => c.my && c.memory.role == 'harvester');
 		let maxSegments = Math.floor(room.energyAvailable / segmentCost);
+		if (harvesters.length >= 1){
+			maxSegments = Math.floor(room.energyCapacityAvailable/segmentCost);
+		}
 		_.times(maxSegments, function(){
 			_.forEach(segment, s => body.push(s));
 		});
+		console.log(JSON.stringify(body));
 		return body;
 	}
 }
@@ -211,7 +218,7 @@ return module.exports;
 /********** Start module 5: D:\git\Z33Screeps\src\creeps\upgrader.js **********/
 __modules[5] = function(module, exports) {
 var roleUpgrader = {
-	num: 2,
+	num: 1,
 
     /** @param {Creep} creep **/
     run: function(creep) {
@@ -253,11 +260,15 @@ var roleUpgrader = {
 	getBody: function(segment, room){
 		var body = [];
 		let segmentCost = _.sum(segment, s => BODYPART_COST[s]);
-		let energyAvailable = room.energyAvailable;
-		let maxSegments = Math.floor(energyAvailable / segmentCost);
+		let upgraders = _.filter(room.creeps, (c) => c.my && c.memory.role == 'upgrader');
+		let maxSegments = Math.floor(room.energyAvailable / segmentCost);
+		if (upgraders.length >= 1){
+			maxSegments = Math.floor(room.energyCapacityAvailable/segmentCost);
+		}
 		_.times(maxSegments, function(){
 			_.forEach(segment, s => body.push(s));
 		});
+		console.log(JSON.stringify(body));
 		return body;
 	}
 };
@@ -269,12 +280,13 @@ return module.exports;
 /********** Start module 6: D:\git\Z33Screeps\src\creeps\builder.js **********/
 __modules[6] = function(module, exports) {
 var roleBuilder = {
-	num: 2,
+	num: 3,
 
 	/**@param {Creep} creep */
 	run: function(creep){
 		if (!creep.memory.working && creep.store.getFreeCapacity(RESOURCE_ENERGY) > 0){
 			creep.getEnergy();
+			return;
 		}
 		if (creep.memory.working && creep.store.getUsedCapacity([RESOURCE_ENERGY]) == 0){
 			creep.memory.working = false;
@@ -289,14 +301,14 @@ var roleBuilder = {
 			let targets = creep.room.find(FIND_MY_CONSTRUCTION_SITES);
 			let priorityList = [STRUCTURE_EXTENSION, STRUCTURE_CONTAINER, STRUCTURE_WALL, STRUCTURE_RAMPART, STRUCTURE_ROAD];
 			let possible = creep.findPriority(targets, priorityList);
-			console.log(possible);
 			creep.memory.destination = possible;
+			return;
 		}
 		if (creep.memory.working && creep.memory.destination != false){
 			let workSite = Game.getObjectById(creep.memory.destination);
-			if (workSite.progress == workSite.progressTotal){
+			if (workSite == null || workSite.progress == workSite.progreSssTotal){
 				creep.memory.destination = false;
-			} else {
+			} else if (workSite){
 				creep.zMove(workSite.id, 2);
 			}
 		} else {
@@ -315,7 +327,7 @@ var roleBuilder = {
     },
     spawnData: function(room) {
             let name = 'Builder' + Game.time;
-            let bodySegment = [WORK, CARRY, MOVE];
+            let bodySegment = [WORK, CARRY, MOVE, MOVE];
 			var body = this.getBody(bodySegment, room);
             let memory = {role: 'builder', working: false, destination: false, source: false};
         
@@ -347,6 +359,7 @@ var roleHealer = {
     run: function(creep){
 		if (creep.memory.working && creep.store.getUsedCapacity([RESOURCE_ENERGY]) == 0){
 			creep.memory.working = false;
+			creep.memory.source = false;
 		}
 		if (!creep.memory.working && (creep.store.getUsedCapacity([RESOURCE_ENERGY]) == creep.store.getCapacity([RESOURCE_ENERGY]))){
 			creep.memory.working = true;
@@ -355,15 +368,18 @@ var roleHealer = {
 
 		if (creep.memory.working && !creep.memory.destination) {
 			let targets = creep.room.find(FIND_STRUCTURES);
-			let prioTargets = _.filter(targets, (t) => t.structureType != STRUCTURE_WALL);
-			let attempt = _.find(prioTargets, (t) => t.hits < t.hitsMax);
-			if (attempt != undefined){
-				creep.memory.destination = attempt.id;
+			let priorityList = [STRUCTURE_SPAWN, STRUCTURE_EXTENSION, STRUCTURE_CONTAINER, STRUCTURE_ROAD];
+			let l = _.filter(targets, (t) => t.hits < t.hitsMax);
+			let priority = creep.findPriority(l, priorityList);
+			if (priority != undefined){
+				console.log(JSON.stringify(Game.getObjectById(priority)));
+				creep.memory.destination = priority;
 			} else {
-				let secTargets = _.filter(targets, (t) => t.structureType == STRUCTURE_WALL);
+				let wall = undefined;
 				for(let p = .00001; p < 1; p += .00001){
-					creep.memory.destination = _.find(secTargets, (w) => w.hits/w.hitsMax < p).id;
-					if (creep.memory.destination != undefined || creep.memory.destination != false) { break; }
+					console.log(p);
+					wall = _.find(l, (w) => w.hits/w.hitsMax < p && w.structureType == STRUCTURE_WALL);
+					if (wall != undefined) { creep.memory.destination = wall.id; break; }
 				}
 			}
 		}
@@ -372,7 +388,7 @@ var roleHealer = {
 			if (workSite.hits == workSite.hitsMax){
 				creep.memory.destination = false;
 			} else {
-				creep.zMove(workSite.id, 1);
+				creep.zMove(creep.memory.destination, this.range);
 			}
 		} else {
 			creep.getEnergy();
@@ -413,9 +429,76 @@ module.exports = roleHealer;
 return module.exports;
 }
 /********** End of module 7: D:\git\Z33Screeps\src\creeps\healer.js **********/
-/********** Start module 8: D:\git\Z33Screeps\src\room\spawning.js **********/
+/********** Start module 8: D:\git\Z33Screeps\src\creeps\miner.js **********/
 __modules[8] = function(module, exports) {
-let creepLogic = __require(1,8);
+const creepLogic = __require(12,8);
+const { miner } = __require(12,8);
+
+var roleMiner = {
+
+    /** @param {Creep} creep **/
+    run: function(creep){
+		if (!creep.memory.destination && !creep.memory.source){
+			let containers = _.filter(Game.structures, (s) => s.my && s.room.name == room.name && s.structureType == StructureContainer);
+			let miners = _.filter(Memory.creeps, (creep) => creep.memory.role == 'miner');
+			let currentRoom = creep.room.name;
+			let sources = Memory.rooms[currentRoom].resources[currentRoom].energy;
+			console.log(JSON.stringify(sources));
+			_.forEach(miners, function(m){
+				for(let c of containers){
+					if (m.pos != c.pos){
+						creep.memory.destination = c.id;
+						creep.memory.source = c.pos.findClosestByRange(sources).id;
+					}
+				}
+			});
+		}
+		if (!creep.memory.working){
+			creep.zMove(creep.memory.destination, 0);
+		}
+		if (creep.memory.working == true && (creep.store.getFreeCapacity([]) == 0 || creep.ticksToLive < 2)){
+			creep.transfer(Game.getObjectById(creep.memory.destination));
+		}
+	},
+    spawn: function(room) {
+        var miners = _.filter(Game.creeps, (creep) => creep.memory.role == 'miner' && creep.room.name == room.name);
+		var containers = _.filter(Game.structures, (s) => s.my && s.room.name == room.name && s.structureType == StructureContainer);
+        console.log('Miner: ' + miners.length, room.name);
+
+        if (miners.length < containers.length) {
+            return true;
+        }
+    },
+    spawnData: function(room) {
+            let name = 'Miner' + Game.time;
+            var bodySegment = [WORK];
+			var body = this.getBody(bodySegment, room);
+			body.push(CARRY, MOVE);
+            let memory = {role: 'miner', working: false, destination: false, source: false};
+            return {name, body, memory};
+    },
+	getBody: function(segment, room){
+		var body = [];
+		let segmentCost = _.sum(segment, s => BODYPART_COST[s]);
+		let miners = _.filter(room.creeps, (c) => c.my && c.memory.role == 'miner');
+		let maxSegments = Math.floor((room.energyAvailable - 100) / segmentCost);
+		if (miners.length >= 1){
+			maxSegments = Math.floor((room.energyCapacityAvailable - 100)/segmentCost);
+		}
+		_.times(maxSegments, function(){
+			_.forEach(segment, s => body.push(s));
+		});
+		return body;
+	}
+}
+
+module.exports = roleMiner;
+return module.exports;
+}
+/********** End of module 8: D:\git\Z33Screeps\src\creeps\miner.js **********/
+/********** Start module 9: D:\git\Z33Screeps\src\room\spawning.js **********/
+__modules[9] = function(module, exports) {
+let creepLogic = __require(1,9);
 let creepTypes = _.keys(creepLogic);
 
 function spawnCreeps(room) {
@@ -436,11 +519,11 @@ function spawnCreeps(room) {
 module.exports = spawnCreeps;
 return module.exports;
 }
-/********** End of module 8: D:\git\Z33Screeps\src\room\spawning.js **********/
-/********** Start module 9: D:\git\Z33Screeps\src\prototypes\creep.js **********/
-__modules[9] = function(module, exports) {
-const creepLogic = __require(1,9);
-const { spawning } = __require(2,9);
+/********** End of module 9: D:\git\Z33Screeps\src\room\spawning.js **********/
+/********** Start module 10: D:\git\Z33Screeps\src\prototypes\creep.js **********/
+__modules[10] = function(module, exports) {
+const creepLogic = __require(1,10);
+const { spawning } = __require(2,10);
 
 Creep.prototype.debug = true;
 Creep.prototype.zMove = function zMove(t, r){
@@ -463,6 +546,7 @@ Creep.prototype.doJob = function doJob(t){
 		case 'builder': this.build(t); break;
 		case 'upgrader': this.upgradeController(t); break;
 		case 'healer': this.repair(t); break;
+		case 'miner': console.log(this.name, ' has reached the intended location.'); this.memory.working = true; break;
 	}
 }
 Creep.prototype.getEnergy = function getEnergy(){
@@ -482,8 +566,13 @@ Creep.prototype.getEnergy = function getEnergy(){
 		default: 
 			if (this.memory.source == false) {
 				this.findEnergyStructure();
+				break;
 			}
 			gameObj = Game.getObjectById(this.memory.source);
+			if (gameObj.energyCapacityAvaliable < this.store.getFreeCapacity([RESOURCE_ENERGY])){
+				this.findEnergyStructure();
+				break;
+			}
 			if (this.pos.isNearTo(gameObj)){
 				if (gameObj.structureType != undefined){
 					this.withdraw(gameObj, RESOURCE_ENERGY);
@@ -527,12 +616,13 @@ Creep.prototype.findPriority = function(list, queue){
 		prio = _.find(list, (l) => l.structureType == queue[i]);
 		if (prio != undefined){ return prio.id; }
 	}
+	return prio;
 }
 return module.exports;
 }
-/********** End of module 9: D:\git\Z33Screeps\src\prototypes\creep.js **********/
-/********** Start module 10: D:\git\Z33Screeps\src\prototypes\roomPosition.js **********/
-__modules[10] = function(module, exports) {
+/********** End of module 10: D:\git\Z33Screeps\src\prototypes\creep.js **********/
+/********** Start module 11: D:\git\Z33Screeps\src\prototypes\roomPosition.js **********/
+__modules[11] = function(module, exports) {
 RoomPosition.prototype.getNearbyPositions = function getNearbyPositions(range){
 	var positions = [];
 
@@ -564,7 +654,13 @@ RoomPosition.prototype.getOpenPositions = function getOpenPositions(range){
 }
 return module.exports;
 }
-/********** End of module 10: D:\git\Z33Screeps\src\prototypes\roomPosition.js **********/
+/********** End of module 11: D:\git\Z33Screeps\src\prototypes\roomPosition.js **********/
+/********** Start module 12: D:\git\Z33Screeps\dist\main.js **********/
+__modules[12] = function(module, exports) {
+
+return module.exports;
+}
+/********** End of module 12: D:\git\Z33Screeps\dist\main.js **********/
 /********** Footer **********/
 if(typeof module === "object")
 	module.exports = __require(0);

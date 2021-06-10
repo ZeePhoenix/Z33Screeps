@@ -7,7 +7,7 @@ var harvester = {
 		// If we are dropping off Energy and empty, go Mine
 		if (creep.memory.working && creep.store.getUsedCapacity([RESOURCE_ENERGY]) == 0){
 			creep.memory.working = false;
-			//creep.memory.destination = false;
+			creep.memory.source = false;
 		}
 		// If we are Filling up on Energy and full, go work
 		if (!creep.memory.working && (creep.store.getUsedCapacity([RESOURCE_ENERGY]) == creep.store.getCapacity([RESOURCE_ENERGY]))){
@@ -32,7 +32,7 @@ var harvester = {
 		// Ensure our workSite is accurate, and then get to it
 		if (creep.memory.working && creep.memory.destination != false){
 			let workSite = Game.getObjectById(creep.memory.destination);
-			if (workSite.store.getFreeCapacity([RESOURCE_ENERGY]) == 0){
+			if (workSite == null || workSite.store.getFreeCapacity([RESOURCE_ENERGY]) == 0){
 				creep.memory.destination = false;
 			} else {
 				creep.zMove(workSite.id, 1);
@@ -64,10 +64,15 @@ var harvester = {
 	getBody: function(segment, room){
 		var body = [];
 		let segmentCost = _.sum(segment, s => BODYPART_COST[s]);
+		let harvesters = _.filter(room.creeps, (c) => c.my && c.memory.role == 'harvester');
 		let maxSegments = Math.floor(room.energyAvailable / segmentCost);
+		if (harvesters.length >= 1){
+			maxSegments = Math.floor(room.energyCapacityAvailable/segmentCost);
+		}
 		_.times(maxSegments, function(){
 			_.forEach(segment, s => body.push(s));
 		});
+		console.log(JSON.stringify(body));
 		return body;
 	}
 }

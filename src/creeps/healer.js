@@ -7,7 +7,7 @@ var roleHealer = {
 		// If we are BUILDING and empty, go Mine
 		if (creep.memory.working && creep.store.getUsedCapacity([RESOURCE_ENERGY]) == 0){
 			creep.memory.working = false;
-			//creep.memory.destination = false;
+			creep.memory.source = false;
 		}
 		// If we are Filling up on Energy and full, go work
 		if (!creep.memory.working && (creep.store.getUsedCapacity([RESOURCE_ENERGY]) == creep.store.getCapacity([RESOURCE_ENERGY]))){
@@ -17,17 +17,22 @@ var roleHealer = {
 
 		if (creep.memory.working && !creep.memory.destination) {
 			let targets = creep.room.find(FIND_STRUCTURES);
-			let prioTargets = _.filter(targets, (t) => t.structureType != STRUCTURE_WALL);
-			let attempt = _.find(prioTargets, (t) => t.hits < t.hitsMax);
-			if (attempt != undefined){
-				creep.memory.destination = attempt.id;
+			let priorityList = [STRUCTURE_SPAWN, STRUCTURE_EXTENSION, STRUCTURE_CONTAINER, STRUCTURE_ROAD];
+			let l = _.filter(targets, (t) => t.hits < t.hitsMax);
+			let priority = creep.findPriority(l, priorityList);
+			// If we have one of our priority targets
+			if (priority != undefined){
+				console.log(JSON.stringify(Game.getObjectById(priority)));
+				creep.memory.destination = priority;
 			} else {
-				let secTargets = _.filter(targets, (t) => t.structureType == STRUCTURE_WALL);
+				//let secTargets = _.filter(targets, (t) => t.structureType == STRUCTURE_WALL);
+				let wall = undefined;
 				for(let p = .00001; p < 1; p += .00001){
+					console.log(p);
 					// Get a wall at our current percentage
-					creep.memory.destination = _.find(secTargets, (w) => w.hits/w.hitsMax < p).id;
+					wall = _.find(l, (w) => w.hits/w.hitsMax < p && w.structureType == STRUCTURE_WALL);
 					// If there is one, break out of the loop
-					if (creep.memory.destination != undefined || creep.memory.destination != false) { break; }
+					if (wall != undefined) { creep.memory.destination = wall.id; break; }
 				}
 			}
 		}
@@ -37,7 +42,7 @@ var roleHealer = {
 			if (workSite.hits == workSite.hitsMax){
 				creep.memory.destination = false;
 			} else {
-				creep.zMove(workSite.id, 1);
+				creep.zMove(creep.memory.destination, this.range);
 			}
 		} else {
 			creep.getEnergy();

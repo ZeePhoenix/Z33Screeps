@@ -1,5 +1,5 @@
 var roleUpgrader = {
-	num: 2,
+	num: 1,
 
     /** @param {Creep} creep **/
     run: function(creep) {
@@ -47,11 +47,15 @@ var roleUpgrader = {
 	getBody: function(segment, room){
 		var body = [];
 		let segmentCost = _.sum(segment, s => BODYPART_COST[s]);
-		let energyAvailable = room.energyAvailable;
-		let maxSegments = Math.floor(energyAvailable / segmentCost);
+		let upgraders = _.filter(room.creeps, (c) => c.my && c.memory.role == 'upgrader');
+		let maxSegments = Math.floor(room.energyAvailable / segmentCost);
+		if (upgraders.length >= 1){
+			maxSegments = Math.floor(room.energyCapacityAvailable/segmentCost);
+		}
 		_.times(maxSegments, function(){
 			_.forEach(segment, s => body.push(s));
 		});
+		console.log(JSON.stringify(body));
 		return body;
 	}
 };
