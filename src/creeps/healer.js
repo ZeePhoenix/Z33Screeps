@@ -10,35 +10,17 @@ var roleHealer = {
 		}
 
 		if (creep.memory.working){
-			var targets = creep.room.find(FIND_MY_STRUCTURES);
-			
-			let pTargets = _.filter(targets, function(struct){
-				return (struct.hits < struct.hitsMax && struct.structureType != STRUCTURE_WALL); 
-			});
-			// We have a priority target to go to
-			if(pTargets.length){
-				// Find closest target to creep
-				let target = creep.pos.findClosestByRange(targets);
-				// Transfer energy if we're there, else move to it
-				if(creep.pos.isNearTo(target)){
-					creep.repair(target);
-				} else {
-					creep.moveZ(target, true);
-				}
+			var targets = creep.room.find(FIND_STRUCTURES);
+			let priorities = _.filter(targets, (s) => s.structureType != STRUCTURE_WALL && s.hits < s.hitsMax);
+			if (priorities.length){
+				creep.zMove(creep.pos.findClosestByRange(priorities));
 			} else {
-				targets = creep.room.find(FIND_STRUCTURES);
-				let wTargets = _.filter(targets, function(struct){ return (struct.structureType == STRUCTURE_WALL); });
-				var targetWall = undefined;
-				for (let p = 0.00001; p <= 1; p += .00001){
-					for (let wall in wTargets){
-						if (wall.hits / wall.hitsMax < p) { targetWall = wall; break; }
+				
+				let walls = _.filter(targets, (s) => s.structureType == STRUCTURE_WALL && s.hits < s.hitsMax);
+				for (let p = 0.0001; p <= 1; p += .0001){
+					for (let wall of walls){
+						if (wall.hits / wall.hitsMax < p) { creep.zMove(wall); break; }
 					}
-				}
-				console.log(targetWall);
-				if (targetWall != undefined){
-					if(creep.repair(targetWall) == ERR_NOT_IN_RANGE){
-						creep.moveZ(targetWall, true);
-					} 
 				}
 			}
 		}

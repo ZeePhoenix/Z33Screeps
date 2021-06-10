@@ -2,14 +2,15 @@ let creepLogic = require('./creeps');
 let roomLogic = require('./room');
 let prototypes = require('./prototypes');
 
-
 module.exports.loop = function () {
 	console.log('---------------- $(Game.time) ---------------------'.replace('$(Game.time)', Game.time));
     // make a list of all of our rooms
     Game.myRooms = _.filter(Game.rooms, r => r.controller && r.controller.level > 0 && r.controller.my);
 
-    // run spwan logic for each room in our empire
-    _.forEach(Game.myRooms, r => roomLogic.spawning(r));
+    // run spwan logic for each room in our empire run only every 5 ticks
+	if (Game.time % 5 == 0) {
+		_.forEach(Game.myRooms, r => roomLogic.spawning(r));
+	}
     
     // run each creep role see /creeps/index.js
     for(var name in Game.creeps) {

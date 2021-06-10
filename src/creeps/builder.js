@@ -20,9 +20,7 @@ var roleBuilder = {
 						target = pTargets[name];
 					}
 				}
-				if (creep.build(target) == ERR_NOT_IN_RANGE){
-					creep.moveZ(target, true);
-				}
+				creep.zMove(target);
 			} else {
 				let bTargets = _.filter(targets, (t) => t.structureType == STRUCTURE_ROAD);
 				var workDone = 0;
@@ -33,9 +31,7 @@ var roleBuilder = {
 						target = targets[name];
 					}
 				}
-				if (creep.build(target) == ERR_NOT_IN_RANGE){
-					creep.moveZ(target, true);
-				}
+				creep.zMove(target);
 			}
 		} else {
 			creep.getEnergy();
@@ -60,7 +56,7 @@ var roleBuilder = {
         
             return {name, body, memory};
     },
-
+	// Gets the larges body we can
 	getBody: function(segment, room){
 		var body = [];
 		let segmentCost = _.sum(segment, s => BODYPART_COST[s]);

@@ -19,11 +19,7 @@ var harvester = {
 				// Find closest target to creep
 				let target = creep.pos.findClosestByRange(targets);
 				// Transfer energy if we're there, else move to it
-				if(creep.pos.isNearTo(target)){
-					creep.transfer(target, RESOURCE_ENERGY);
-				} else {
-					creep.moveZ(target, true);
-				}
+				creep.zMove(target);
 			}
 		}
 		else {
