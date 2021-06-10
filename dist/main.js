@@ -189,7 +189,7 @@ var harvester = {
             let name = 'Harvester' + Game.time;
             var bodySegment = [WORK, CARRY, MOVE];
 			var body = this.getBody(bodySegment, room);
-            let memory = {role: 'harvester', source: false, destination: false};
+            let memory = {role: 'harvester', working: false, destination: false, source: false};
             return {name, body, memory};
     },
 
@@ -217,6 +217,7 @@ var roleUpgrader = {
     run: function(creep) {
 		if (creep.memory.working && creep.store.getUsedCapacity([RESOURCE_ENERGY]) == 0){
 			creep.memory.working = false;
+			creep.memory.source = false;
 		}
 		if (!creep.memory.working && (creep.store.getUsedCapacity([RESOURCE_ENERGY]) == creep.store.getCapacity([RESOURCE_ENERGY]))){
 			creep.memory.working = true;
@@ -244,7 +245,7 @@ var roleUpgrader = {
             let name = 'Upgrader' + Game.time;
             let bodySegment = [WORK, CARRY, MOVE];
 			var body = this.getBody(bodySegment, room);
-            let memory = {role: 'upgrader', working: false, destination: false, source: undefined};
+            let memory = {role: 'upgrader', working: false, destination: false, source: false};
         
             return {name, body, memory};
     },
@@ -316,7 +317,7 @@ var roleBuilder = {
             let name = 'Builder' + Game.time;
             let bodySegment = [WORK, CARRY, MOVE];
 			var body = this.getBody(bodySegment, room);
-            let memory = {role: 'builder', working: false, destination: false};
+            let memory = {role: 'builder', working: false, destination: false, source: false};
         
             return {name, body, memory};
     },
@@ -391,7 +392,7 @@ var roleHealer = {
             let name = 'Healer' + Game.time;
             let bodySegment = [WORK, CARRY, MOVE, MOVE];
 			var body = this.getBody(bodySegment, room);
-            let memory = {role: 'healer'};
+            let memory = {role: 'healer', working: false, destination: false, source: false};
         
             return {name, body, memory};
     },

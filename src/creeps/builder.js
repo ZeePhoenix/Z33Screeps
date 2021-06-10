@@ -56,7 +56,7 @@ var roleBuilder = {
             let name = 'Builder' + Game.time;
             let bodySegment = [WORK, CARRY, MOVE];
 			var body = this.getBody(bodySegment, room);
-            let memory = {role: 'builder', working: false, destination: false};
+            let memory = {role: 'builder', working: false, destination: false, source: false};
         
             return {name, body, memory};
     },

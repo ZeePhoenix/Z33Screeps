@@ -57,7 +57,7 @@ var harvester = {
             let name = 'Harvester' + Game.time;
             var bodySegment = [WORK, CARRY, MOVE];
 			var body = this.getBody(bodySegment, room);
-            let memory = {role: 'harvester', source: false, destination: false};
+            let memory = {role: 'harvester', working: false, destination: false, source: false};
             return {name, body, memory};
     },
 

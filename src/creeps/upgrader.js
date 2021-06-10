@@ -3,10 +3,11 @@ var roleUpgrader = {
 
     /** @param {Creep} creep **/
     run: function(creep) {
+
 		// If we are BUILDING and empty, go Mine
 		if (creep.memory.working && creep.store.getUsedCapacity([RESOURCE_ENERGY]) == 0){
 			creep.memory.working = false;
-			//creep.memory.destination = false;
+			creep.memory.source = false;
 		}
 		// If we are Filling up on Energy and full, go work
 		if (!creep.memory.working && (creep.store.getUsedCapacity([RESOURCE_ENERGY]) == creep.store.getCapacity([RESOURCE_ENERGY]))){
@@ -38,7 +39,7 @@ var roleUpgrader = {
             let name = 'Upgrader' + Game.time;
             let bodySegment = [WORK, CARRY, MOVE];
 			var body = this.getBody(bodySegment, room);
-            let memory = {role: 'upgrader', working: false, destination: false, source: undefined};
+            let memory = {role: 'upgrader', working: false, destination: false, source: false};
         
             return {name, body, memory};
     },
