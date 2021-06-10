@@ -38,7 +38,7 @@ var roleUpgrader = {
             let name = 'Upgrader' + Game.time;
             let bodySegment = [WORK, CARRY, MOVE];
 			var body = this.getBody(bodySegment, room);
-            let memory = {role: 'upgrader'};
+            let memory = {role: 'upgrader', working: false, destination: false, source: undefined};
         
             return {name, body, memory};
     },

@@ -1,5 +1,6 @@
 var harvester = {
-	num: 4,
+	// TODO: this should be programatically decided
+	num: 2,
 
     /** @param {Creep} creep **/
     run: function(creep){
