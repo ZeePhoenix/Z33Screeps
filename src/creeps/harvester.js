@@ -1,5 +1,5 @@
 var harvester = {
-	num: 3,
+	num: 4,
 
     /** @param {Creep} creep **/
     run: function(creep){

@@ -34,6 +34,7 @@ var roleBuilder = {
 					}
 				}
 			}
+			console.log(creep.memory.destination);
 		}
 		// We must need energy
 		if (creep.memory.working && creep.memory.destination != false){
