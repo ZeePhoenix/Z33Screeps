@@ -1,4 +1,5 @@
 var roleUpgrader = {
+	num: 3,
 
     /** @param {Creep} creep **/
     run: function(creep) {
@@ -10,7 +11,7 @@ var roleUpgrader = {
 		}
 
 		if (creep.memory.working){
-			creep.zMove(creep.room.controller, 2);
+			creep.zMove(creep.room.controller, 3);
 		} else {
 			creep.getEnergy();
 		}
@@ -20,7 +21,7 @@ var roleUpgrader = {
         var upgraders = _.filter(Game.creeps, (creep) => creep.memory.role == 'upgrader' && creep.room.name == room.name);
         console.log('Upgraders: ' + upgraders.length, room.name);
 
-        if (upgraders.length < 2 ) {
+        if (upgraders.length < this.num ) {
             return true;
         }
     },

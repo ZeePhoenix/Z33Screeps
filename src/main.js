@@ -7,8 +7,8 @@ module.exports.loop = function () {
     // make a list of all of our rooms
     Game.myRooms = _.filter(Game.rooms, r => r.controller && r.controller.level > 0 && r.controller.my);
 
-    // run spwan logic for each room in our empire run only every 5 ticks
-	if (Game.time % 5 == 0) {
+    // run spwan logic for each room in our empire run only every X ticks
+	if (Game.time % 8 == 0) {
 		_.forEach(Game.myRooms, r => roomLogic.spawning(r));
 	}
     

@@ -1,4 +1,5 @@
 var harvester = {
+	num: 3,
 
     /** @param {Creep} creep **/
     run: function(creep){
@@ -40,7 +41,7 @@ var harvester = {
         var harvesters = _.filter(Game.creeps, (creep) => creep.memory.role == 'harvester' && creep.room.name == room.name);
         console.log('Harvesters: ' + harvesters.length, room.name);
 
-        if (harvesters.length < 2) {
+        if (harvesters.length < this.num) {
             return true;
         }
     },
@@ -60,7 +61,6 @@ var harvester = {
 		_.times(maxSegments, function(){
 			_.forEach(segment, s => body.push(s));
 		});
-		console.log(body, room.energyAvailable, maxSegments, segmentCost);
 		return body;
 	}
 }

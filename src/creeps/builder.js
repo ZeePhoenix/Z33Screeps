@@ -1,4 +1,6 @@
 var roleBuilder = {
+	num: 2,
+
 	/**@param {Creep} creep */
 	run: function(creep){
 		if (creep.memory.working && creep.store[RESOURCE_ENERGY] == 0){
@@ -43,7 +45,7 @@ var roleBuilder = {
 		let constructions = _.filter(Game.constructionSites, (site) => site.room.name == room.name);
         console.log('Builder: ' + upgraders.length, room.name);
 
-        if (upgraders.length < 2 && constructions.length > 0) {
+        if (upgraders.length < this.num && constructions.length > 0) {
             return true;
         }
     },

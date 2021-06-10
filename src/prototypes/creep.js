@@ -1,4 +1,4 @@
-Creep.prototype.debug = false;
+Creep.prototype.debug = true;
 
 // Allows for drawing of move path based on debug
 Creep.prototype.zMove = function zMove(t, r){

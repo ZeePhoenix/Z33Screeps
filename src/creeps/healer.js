@@ -1,4 +1,5 @@
 var roleHealer = {
+	num: 1,
 
     /** @param {Creep} creep **/
     run: function(creep){
@@ -17,7 +18,7 @@ var roleHealer = {
 			} else {
 				
 				let walls = _.filter(targets, (s) => s.structureType == STRUCTURE_WALL && s.hits < s.hitsMax);
-				for (let p = 0.0001; p <= 1; p += .0001){
+				for (let p = 0.00001; p <= 1; p += .00001){
 					for (let wall of walls){
 						if (wall.hits / wall.hitsMax < p) { creep.zMove(wall, 1); break; }
 					}
@@ -38,7 +39,7 @@ var roleHealer = {
 		console.log('Healers: ' + healers.length, room.name);
 		switch (extensions.length){
 			case 0: case 1: return false; break;
-			default: if (healers.length < 1 && creeps.length < 10) { return true; } break;
+			default: if (healers.length < this.num ) { return true; } break;
 		}
     },
     // returns an object with the data to spawn a new creep
