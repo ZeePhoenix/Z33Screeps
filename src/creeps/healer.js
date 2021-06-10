@@ -24,7 +24,7 @@ var roleHealer = {
 					}
 				}
 			}
-		} else if (creep.memory.working) {
+		} else if (creep.memory.working && creep.memory.destination) {
 			creep.zMove(Game.getObjectById(creep.memory.destination), 2);
 		}
 		else {

@@ -33,7 +33,7 @@ var roleBuilder = {
 						target = targets[name];
 					}
 				}
-				creep.zMove(target, 2);
+				creep.zMove(target, 3);
 			}
 		} else {
 			creep.getEnergy();

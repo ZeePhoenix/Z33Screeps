@@ -11,6 +11,11 @@ module.exports.loop = function () {
 	if (Game.time % 8 == 0) {
 		_.forEach(Game.myRooms, r => roomLogic.spawning(r));
 	}
+
+	if (Game.time % 100 == 0) {
+		console.log('Finding Room Sources')
+		_.forEach(Game.myRooms, r => roomLogic.identifySources(r));
+	}
     
     // run each creep role see /creeps/index.js
     for(var name in Game.creeps) {

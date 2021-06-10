@@ -1,5 +1,5 @@
 var roleUpgrader = {
-	num: 3,
+	num: 2,
 
     /** @param {Creep} creep **/
     run: function(creep) {
@@ -11,7 +11,7 @@ var roleUpgrader = {
 		}
 
 		if (creep.memory.working){
-			creep.zMove(creep.room.controller, 3);
+			creep.zMove(creep.room.controller, 2);
 		} else {
 			creep.getEnergy();
 		}

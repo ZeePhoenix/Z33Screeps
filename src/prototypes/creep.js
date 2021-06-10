@@ -1,6 +1,8 @@
+const { spawning } = require("../room");
+
 Creep.prototype.debug = true;
 
-// Allows for drawing of move path based on debug
+// Move to our stored destination, and if in range, do the job
 Creep.prototype.zMove = function zMove(t, r){
 	let storedDest = Game.getObjectById(this.memory.destination);
 	if (!storedDest || (!storedDest.pos.getOpenPositions(r).length && !this.pos.inRangeTo(storedDest, r))){
@@ -58,6 +60,8 @@ Creep.prototype.getEnergy = function getEnergy(){
 }
 
 // Find us an energy source
+// TODO make this use the archived Source Data
+// Assign 1 harvester per Source that can drain it fully
 Creep.prototype.findEnergySource = function findEnergySource(){
 	let sources = this.room.find(FIND_SOURCES_ACTIVE);
 	if (sources.length){

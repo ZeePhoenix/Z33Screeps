@@ -9,7 +9,7 @@ var harvester = {
 		if(!creep.memory.working && creep.store.getFreeCapacity([RESOURCE_ENERGY]) == 0){
 			creep.memory.working = true;
 		}
-
+		// If we are to be working but don't have a destination, get one and go
 		if (creep.memory.working && !creep.memory.destination){
 			var targets = creep.room.find(FIND_MY_STRUCTURES);
 			// Only deliver energy to these structures if they need energy
@@ -28,10 +28,13 @@ var harvester = {
 				}
 				// Get it done
 				creep.zMove(target, 1);
-			} else {
-				creep.zMove(Game.getObjectById(creep.memory.destination), 1);
 			}
-		}
+		} 
+		// If we already have a destination Go there
+		else if (creep.memory.working && creep.memory.destination){
+			creep.zMove(Game.getObjectById(creep.memory.destination), 1);
+		} 
+		// We must need energy
 		else {
 			creep.getEnergy();
 		}
@@ -50,7 +53,7 @@ var harvester = {
             let name = 'Harvester' + Game.time;
             var bodySegment = [WORK, CARRY, MOVE];
 			var body = this.getBody(bodySegment, room);
-            let memory = {role: 'harvester'};
+            let memory = {role: 'harvester', atSource: undefined};
             return {name, body, memory};
     },
 
