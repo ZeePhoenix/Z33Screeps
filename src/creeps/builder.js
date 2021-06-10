@@ -10,10 +10,24 @@ var roleBuilder = {
 
 		if (creep.memory.working){
 			var targets = creep.room.find(FIND_MY_CONSTRUCTION_SITES);
-			if (targets.length){
+			let pTargets = _.filter(targets, (t) => t.structureType != STRUCTURE_ROAD);
+			if (pTargets.length){
 				var workDone = 0;
 				var target;
-				for (var name in targets){
+				for (var name in pTargets){
+					if (pTargets[name].progress >= workDone) {
+						workDone = pTargets[name].progress;
+						target = pTargets[name];
+					}
+				}
+				if (creep.build(target) == ERR_NOT_IN_RANGE){
+					creep.moveZ(target, true);
+				}
+			} else {
+				let bTargets = _.filter(targets, (t) => t.structureType == STRUCTURE_ROAD);
+				var workDone = 0;
+				var target;
+				for (var name in bTargets){
 					if (targets[name].progress >= workDone) {
 						workDone = targets[name].progress;
 						target = targets[name];
@@ -29,21 +43,34 @@ var roleBuilder = {
 	},
     // checks if the room needs to spawn a creep
     spawn: function(room) {
-        var upgraders = _.filter(Game.creeps, (creep) => creep.memory.role == 'builder' && creep.room.name == room.name);
+        let upgraders = _.filter(Game.creeps, (creep) => creep.memory.role == 'builder' && creep.room.name == room.name);
+		let constructions = _.filter(Game.constructionSites, (site) => site.room.name == room.name);
         console.log('Builder: ' + upgraders.length, room.name);
 
-        if (upgraders.length < 4 && (_.filter(Game.creeps, (creep) => creep.memory.role == 'harvester' && creep.room.name == room.name).length > 0)) {
+        if (upgraders.length < 2 && constructions.length > 0) {
             return true;
         }
     },
     // returns an object with the data to spawn a new creep
     spawnData: function(room) {
             let name = 'Builder' + Game.time;
-            var body = [WORK, CARRY, MOVE, MOVE];
+            let bodySegment = [WORK, CARRY, MOVE];
+			var body = this.getBody(bodySegment, room);
             let memory = {role: 'builder'};
         
             return {name, body, memory};
-    }
+    },
+
+	getBody: function(segment, room){
+		var body = [];
+		let segmentCost = _.sum(segment, s => BODYPART_COST[s]);
+		let energyAvailable = room.energyAvailable;
+		let maxSegments = Math.floor(energyAvailable / segmentCost);
+		_.times(maxSegments, function(){
+			_.forEach(segment, s => body.push(s));
+		});
+		return body;
+	}
 };
 
 module.exports = roleBuilder;

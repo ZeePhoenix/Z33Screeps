@@ -4,6 +4,7 @@ let prototypes = require('./prototypes');
 
 
 module.exports.loop = function () {
+	console.log('---------------- $(Game.time) ---------------------'.replace('$(Game.time)', Game.time));
     // make a list of all of our rooms
     Game.myRooms = _.filter(Game.rooms, r => r.controller && r.controller.level > 0 && r.controller.my);
 
