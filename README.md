@@ -1,3 +1,6 @@
+## About
+This is a fork of the screep-starter codebase that allows for a better file structure and IDE integration than the game's defaults.
+
 ## Setup
 
 [![Explainer Video](https://img.youtube.com/vi/N7KMOG8C5vA/0.jpg)](https://www.youtube.com/watch?v=N7KMOG8C5vA)
