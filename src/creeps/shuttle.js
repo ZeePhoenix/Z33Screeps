@@ -1,4 +1,4 @@
-var harvester = {
+var shuttle = {
 	// TODO: this should be programatically decided
 	num: 2,
 
@@ -22,11 +22,7 @@ var harvester = {
 			if (attempt != undefined){
 				creep.memory.destination = attempt.id;
 			} else {
-				let secTargets = _.filter(targets, (t) => (t.structureType == STRUCTURE_CONTAINER || t.structureType == STRUCTURE_STORAGE));
-				let bAttempt = _.find(secTargets, (t) => t.store.getFreeCapacity([RESOURCE_ENERGY]) > 0);
-				if (bAttempt != undefined) {
-					creep.memory.destination = bAttempt.id;
-				}
+
 			}
 		}
 		// Ensure our workSite is accurate, and then get to it
@@ -45,29 +41,29 @@ var harvester = {
 	},
     // checks if the room needs to spawn a creep
     spawn: function(room) {
-        var harvesters = _.filter(Game.creeps, (creep) => creep.memory.role == 'harvester' && creep.room.name == room.name);
+        var shuttles = _.filter(Game.creeps, (creep) => creep.memory.role == 'shuttle' && creep.room.name == room.name);
 		let miners = _.filter(Game.creeps, (creep) => creep.memory.role == 'miner' && creep.room.name == room.name);
-        console.log('Harvesters: ' + harvesters.length, room.name);
+        console.log('Shuttles: ' + shuttles.length, room.name);
 
-        if (harvesters.length < this.num && miners.length == 0 ) {
+        if (shuttles.length < this.num && miners.length > 0) {
             return true;
         }
     },
     // returns an object with the data to spawn a new creep
     spawnData: function(room) {
-            let name = 'Harvester' + Game.time;
-            var bodySegment = [WORK, CARRY, MOVE];
+            let name = 'Shuttle' + Game.time;
+            var bodySegment = [CARRY, MOVE];
 			var body = this.getBody(bodySegment, room);
-            let memory = {role: 'harvester', working: false, destination: false, source: false};
+            let memory = {role: 'shuttle', working: false, destination: false, source: false};
             return {name, body, memory};
     },
 
 	getBody: function(segment, room){
 		var body = [];
 		let segmentCost = _.sum(segment, s => BODYPART_COST[s]);
-		let harvesters = _.filter(room.creeps, (c) => c.my && c.memory.role == 'harvester');
+		let shuttles = _.filter(room.creeps, (c) => c.my && c.memory.role == 'shuttle');
 		let maxSegments = Math.floor(room.energyAvailable / segmentCost);
-		if (harvesters.length >= 1){
+		if (shuttles.length >= 1){
 			maxSegments = Math.floor(room.energyCapacityAvailable/segmentCost);
 		}
 		_.times(maxSegments, function(){
@@ -78,4 +74,4 @@ var harvester = {
 	}
 }
 
-module.exports = harvester;
+module.exports = shuttle;

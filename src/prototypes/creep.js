@@ -23,6 +23,7 @@ Creep.prototype.zMove = function zMove(t, r){
 Creep.prototype.doJob = function doJob(t){
 	switch(this.memory.role){
 		case 'harvester': this.transfer(t, RESOURCE_ENERGY); break;
+		case 'shuttle': this.transfer(t, RESOURCE_ENERGY); break;
 		case 'builder': this.build(t); break;
 		case 'upgrader': this.upgradeController(t); break;
 		case 'healer': this.repair(t); break;

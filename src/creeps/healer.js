@@ -1,5 +1,5 @@
 var roleHealer = {
-	num: 1,
+	num: 2,
 	range: 2,
 
     /** @param {Creep} creep **/
