@@ -55,8 +55,10 @@ Creep.prototype.getEnergy = function getEnergy(){
 			}
 			gameObj = Game.getObjectById(this.memory.source);
 			// Make sure we can get energy from here
-			console.log(gameObj);
-			if (gameObj.energyCapacity != null){ console.log('this is a source, not sturcture'); }
+			//console.log(gameObj);
+			if (gameObj.energyCapacity != null){ 
+				//console.log('this is a source, not sturcture'); 
+			}
 			else if (gameObj.energyCapacityAvaliable < this.store.getFreeCapacity([RESOURCE_ENERGY])){
 				this.findEnergyStructure();
 				break;

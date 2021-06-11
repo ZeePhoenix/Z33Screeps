@@ -7,14 +7,14 @@ var roleMiner = {
     run: function(creep){
 		// Creep has just spawned, where is it going to live?
 		if (!creep.memory.destination && !creep.memory.source){
-			let containers = _.filter(Game.structures, (s) => s.my && s.room.name == room.name && s.structureType == StructureContainer);
-			let miners = _.filter(Memory.creeps, (creep) => creep.memory.role == 'miner');
+			var containers = _.filter(creep.room.find(FIND_STRUCTURES), (s) => s.structureType == STRUCTURE_CONTAINER);
+			let miners = _.filter(Game.creeps, (c) => c.memory.role == 'miner' && c.my);
 			let currentRoom = creep.room.name;
-			let sources = Memory.rooms[currentRoom].resources[currentRoom].energy;
-			console.log(JSON.stringify(sources));
+			let sources = creep.room.find(FIND_SOURCES);
+			//console.log(JSON.stringify(sources));
 			_.forEach(miners, function(m){
 				for(let c of containers){
-					if (m.pos != c.pos){
+					if (m.pos != c.pos && m.pos == creep.pos){
 						creep.memory.destination = c.id;
 						creep.memory.source = c.pos.findClosestByRange(sources).id;
 					}
@@ -25,17 +25,26 @@ var roleMiner = {
 			creep.zMove(creep.memory.destination, 0);
 		}
 		// Sit on our container, and mine
-		if (creep.memory.working == true && (creep.store.getFreeCapacity([]) == 0 || creep.ticksToLive < 2)){
-			creep.transfer(Game.getObjectById(creep.memory.destination));
+		if (creep.memory.working == true){
+			// If we are full or about to die, deposit resources
+			if (creep.store.getFreeCapacity() == 0 || creep.ticksToLive < 2){
+				console.log(creep.transfer(Game.getObjectById(creep.memory.destination), RESOURCE_ENERGY));
+			} else {
+				creep.harvest(Game.getObjectById(creep.memory.source));
+			}
 		}
+		
 	},
     // checks if the room needs to spawn a creep
     spawn: function(room) {
         var miners = _.filter(Game.creeps, (creep) => creep.memory.role == 'miner' && creep.room.name == room.name);
-		var containers = _.filter(Game.structures, (s) => s.my && s.room.name == room.name && s.structureType == StructureContainer);
+		var containers = _.filter(room.find(FIND_STRUCTURES), (s) => s.structureType == STRUCTURE_CONTAINER);
+		console.log(containers);
         console.log('Miner: ' + miners.length, room.name);
+		console.log('Containers: '+ containers.length, room.name);
 
         if (miners.length < containers.length) {
+			console.log('need miner');
             return true;
         }
     },

@@ -22,13 +22,13 @@ var roleHealer = {
 			let priority = creep.findPriority(l, priorityList);
 			// If we have one of our priority targets
 			if (priority != undefined){
-				console.log(JSON.stringify(Game.getObjectById(priority)));
+				//console.log(JSON.stringify(Game.getObjectById(priority)));
 				creep.memory.destination = priority;
 			} else {
 				//let secTargets = _.filter(targets, (t) => t.structureType == STRUCTURE_WALL);
 				let wall = undefined;
 				for(let p = .00001; p < 1; p += .00001){
-					console.log(p);
+					//console.log(p);
 					// Get a wall at our current percentage
 					wall = _.find(l, (w) => w.hits/w.hitsMax < p && w.structureType == STRUCTURE_WALL);
 					// If there is one, break out of the loop

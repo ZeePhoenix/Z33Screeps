@@ -49,7 +49,7 @@ function __getDirname(path) {
 	return require("path").resolve(__dirname + "/" + path + "/../");
 }
 /********** End of header **********/
-/********** Start module 0: D:\git\Z33Screeps\src\main.js **********/
+/********** Start module 0: C:\Users\zcupe\Documents\Programming\Z33Screeps\src\main.js **********/
 __modules[0] = function(module, exports) {
 let creepLogic = __require(1,0);
 let roomLogic = __require(2,0);
@@ -83,8 +83,8 @@ module.exports.loop = function () {
 }
 return module.exports;
 }
-/********** End of module 0: D:\git\Z33Screeps\src\main.js **********/
-/********** Start module 1: D:\git\Z33Screeps\src\creeps\index.js **********/
+/********** End of module 0: C:\Users\zcupe\Documents\Programming\Z33Screeps\src\main.js **********/
+/********** Start module 1: C:\Users\zcupe\Documents\Programming\Z33Screeps\src\creeps\index.js **********/
 __modules[1] = function(module, exports) {
 let creepLogic = {
     harvester:     __require(4,1),
@@ -97,8 +97,8 @@ let creepLogic = {
 module.exports = creepLogic;
 return module.exports;
 }
-/********** End of module 1: D:\git\Z33Screeps\src\creeps\index.js **********/
-/********** Start module 2: D:\git\Z33Screeps\src\room\index.js **********/
+/********** End of module 1: C:\Users\zcupe\Documents\Programming\Z33Screeps\src\creeps\index.js **********/
+/********** Start module 2: C:\Users\zcupe\Documents\Programming\Z33Screeps\src\room\index.js **********/
 __modules[2] = function(module, exports) {
 let roomLogic = {
     spawning:     __require(9,2),
@@ -127,8 +127,8 @@ let roomLogic = {
 module.exports = roomLogic;
 return module.exports;
 }
-/********** End of module 2: D:\git\Z33Screeps\src\room\index.js **********/
-/********** Start module 3: D:\git\Z33Screeps\src\prototypes\index.js **********/
+/********** End of module 2: C:\Users\zcupe\Documents\Programming\Z33Screeps\src\room\index.js **********/
+/********** Start module 3: C:\Users\zcupe\Documents\Programming\Z33Screeps\src\prototypes\index.js **********/
 __modules[3] = function(module, exports) {
 let files = {
     creep: 	__require(10,3),
@@ -136,8 +136,8 @@ let files = {
 }
 return module.exports;
 }
-/********** End of module 3: D:\git\Z33Screeps\src\prototypes\index.js **********/
-/********** Start module 4: D:\git\Z33Screeps\src\creeps\harvester.js **********/
+/********** End of module 3: C:\Users\zcupe\Documents\Programming\Z33Screeps\src\prototypes\index.js **********/
+/********** Start module 4: C:\Users\zcupe\Documents\Programming\Z33Screeps\src\creeps\harvester.js **********/
 __modules[4] = function(module, exports) {
 var harvester = {
 	num: 2,
@@ -214,8 +214,8 @@ var harvester = {
 module.exports = harvester;
 return module.exports;
 }
-/********** End of module 4: D:\git\Z33Screeps\src\creeps\harvester.js **********/
-/********** Start module 5: D:\git\Z33Screeps\src\creeps\upgrader.js **********/
+/********** End of module 4: C:\Users\zcupe\Documents\Programming\Z33Screeps\src\creeps\harvester.js **********/
+/********** Start module 5: C:\Users\zcupe\Documents\Programming\Z33Screeps\src\creeps\upgrader.js **********/
 __modules[5] = function(module, exports) {
 var roleUpgrader = {
 	num: 1,
@@ -276,11 +276,11 @@ var roleUpgrader = {
 module.exports = roleUpgrader;
 return module.exports;
 }
-/********** End of module 5: D:\git\Z33Screeps\src\creeps\upgrader.js **********/
-/********** Start module 6: D:\git\Z33Screeps\src\creeps\builder.js **********/
+/********** End of module 5: C:\Users\zcupe\Documents\Programming\Z33Screeps\src\creeps\upgrader.js **********/
+/********** Start module 6: C:\Users\zcupe\Documents\Programming\Z33Screeps\src\creeps\builder.js **********/
 __modules[6] = function(module, exports) {
 var roleBuilder = {
-	num: 3,
+	num: 2,
 
 	/**@param {Creep} creep */
 	run: function(creep){
@@ -348,8 +348,8 @@ var roleBuilder = {
 module.exports = roleBuilder;
 return module.exports;
 }
-/********** End of module 6: D:\git\Z33Screeps\src\creeps\builder.js **********/
-/********** Start module 7: D:\git\Z33Screeps\src\creeps\healer.js **********/
+/********** End of module 6: C:\Users\zcupe\Documents\Programming\Z33Screeps\src\creeps\builder.js **********/
+/********** Start module 7: C:\Users\zcupe\Documents\Programming\Z33Screeps\src\creeps\healer.js **********/
 __modules[7] = function(module, exports) {
 var roleHealer = {
 	num: 1,
@@ -372,12 +372,10 @@ var roleHealer = {
 			let l = _.filter(targets, (t) => t.hits < t.hitsMax);
 			let priority = creep.findPriority(l, priorityList);
 			if (priority != undefined){
-				console.log(JSON.stringify(Game.getObjectById(priority)));
 				creep.memory.destination = priority;
 			} else {
 				let wall = undefined;
 				for(let p = .00001; p < 1; p += .00001){
-					console.log(p);
 					wall = _.find(l, (w) => w.hits/w.hitsMax < p && w.structureType == STRUCTURE_WALL);
 					if (wall != undefined) { creep.memory.destination = wall.id; break; }
 				}
@@ -428,8 +426,8 @@ var roleHealer = {
 module.exports = roleHealer;
 return module.exports;
 }
-/********** End of module 7: D:\git\Z33Screeps\src\creeps\healer.js **********/
-/********** Start module 8: D:\git\Z33Screeps\src\creeps\miner.js **********/
+/********** End of module 7: C:\Users\zcupe\Documents\Programming\Z33Screeps\src\creeps\healer.js **********/
+/********** Start module 8: C:\Users\zcupe\Documents\Programming\Z33Screeps\src\creeps\miner.js **********/
 __modules[8] = function(module, exports) {
 const creepLogic = __require(12,8);
 const { miner } = __require(12,8);
@@ -439,14 +437,13 @@ var roleMiner = {
     /** @param {Creep} creep **/
     run: function(creep){
 		if (!creep.memory.destination && !creep.memory.source){
-			let containers = _.filter(Game.structures, (s) => s.my && s.room.name == room.name && s.structureType == StructureContainer);
-			let miners = _.filter(Memory.creeps, (creep) => creep.memory.role == 'miner');
+			var containers = _.filter(creep.room.find(FIND_STRUCTURES), (s) => s.structureType == STRUCTURE_CONTAINER);
+			let miners = _.filter(Game.creeps, (c) => c.memory.role == 'miner' && c.my);
 			let currentRoom = creep.room.name;
-			let sources = Memory.rooms[currentRoom].resources[currentRoom].energy;
-			console.log(JSON.stringify(sources));
+			let sources = creep.room.find(FIND_SOURCES);
 			_.forEach(miners, function(m){
 				for(let c of containers){
-					if (m.pos != c.pos){
+					if (m.pos != c.pos && m.pos == creep.pos){
 						creep.memory.destination = c.id;
 						creep.memory.source = c.pos.findClosestByRange(sources).id;
 					}
@@ -456,16 +453,24 @@ var roleMiner = {
 		if (!creep.memory.working){
 			creep.zMove(creep.memory.destination, 0);
 		}
-		if (creep.memory.working == true && (creep.store.getFreeCapacity([]) == 0 || creep.ticksToLive < 2)){
-			creep.transfer(Game.getObjectById(creep.memory.destination));
+		if (creep.memory.working == true){
+			if (creep.store.getFreeCapacity() == 0 || creep.ticksToLive < 2){
+				console.log(creep.transfer(Game.getObjectById(creep.memory.destination), RESOURCE_ENERGY));
+			} else {
+				creep.harvest(Game.getObjectById(creep.memory.source));
+			}
 		}
+		
 	},
     spawn: function(room) {
         var miners = _.filter(Game.creeps, (creep) => creep.memory.role == 'miner' && creep.room.name == room.name);
-		var containers = _.filter(Game.structures, (s) => s.my && s.room.name == room.name && s.structureType == StructureContainer);
+		var containers = _.filter(room.find(FIND_STRUCTURES), (s) => s.structureType == STRUCTURE_CONTAINER);
+		console.log(containers);
         console.log('Miner: ' + miners.length, room.name);
+		console.log('Containers: '+ containers.length, room.name);
 
         if (miners.length < containers.length) {
+			console.log('need miner');
             return true;
         }
     },
@@ -495,8 +500,8 @@ var roleMiner = {
 module.exports = roleMiner;
 return module.exports;
 }
-/********** End of module 8: D:\git\Z33Screeps\src\creeps\miner.js **********/
-/********** Start module 9: D:\git\Z33Screeps\src\room\spawning.js **********/
+/********** End of module 8: C:\Users\zcupe\Documents\Programming\Z33Screeps\src\creeps\miner.js **********/
+/********** Start module 9: C:\Users\zcupe\Documents\Programming\Z33Screeps\src\room\spawning.js **********/
 __modules[9] = function(module, exports) {
 let creepLogic = __require(1,9);
 let creepTypes = _.keys(creepLogic);
@@ -519,8 +524,8 @@ function spawnCreeps(room) {
 module.exports = spawnCreeps;
 return module.exports;
 }
-/********** End of module 9: D:\git\Z33Screeps\src\room\spawning.js **********/
-/********** Start module 10: D:\git\Z33Screeps\src\prototypes\creep.js **********/
+/********** End of module 9: C:\Users\zcupe\Documents\Programming\Z33Screeps\src\room\spawning.js **********/
+/********** Start module 10: C:\Users\zcupe\Documents\Programming\Z33Screeps\src\prototypes\creep.js **********/
 __modules[10] = function(module, exports) {
 const creepLogic = __require(1,10);
 const { spawning } = __require(2,10);
@@ -564,12 +569,14 @@ Creep.prototype.getEnergy = function getEnergy(){
 			}
 			break;
 		default: 
-			if (this.memory.source == false) {
+			if (this.memory.source == false || this.memory.source == null) {
 				this.findEnergyStructure();
 				break;
 			}
 			gameObj = Game.getObjectById(this.memory.source);
-			if (gameObj.energyCapacityAvaliable < this.store.getFreeCapacity([RESOURCE_ENERGY])){
+			if (gameObj.energyCapacity != null){ 
+			}
+			else if (gameObj.energyCapacityAvaliable < this.store.getFreeCapacity([RESOURCE_ENERGY])){
 				this.findEnergyStructure();
 				break;
 			}
@@ -587,13 +594,18 @@ Creep.prototype.getEnergy = function getEnergy(){
 }
 Creep.prototype.findEnergySource = function findEnergySource(){
 	let sources = this.room.find(FIND_SOURCES_ACTIVE);
-	if (sources.length){
-		let source = _.find(sources, function(s){
+	let source = this.pos.findClosestByRange(sources);
+	if (source == undefined) {
+		source = _.find(sources, function(s){
 			return s.pos.getOpenPositions(1).length > 0;
 		});
-		if (source) {
+		if (source != undefined) {
 			this.memory.source = source.id;
+		} else {
+			return;
 		}
+	} else {
+		this.memory.source = source.id
 	}
 }
 Creep.prototype.findEnergyStructure = function findEnergyStructure(){
@@ -620,8 +632,8 @@ Creep.prototype.findPriority = function(list, queue){
 }
 return module.exports;
 }
-/********** End of module 10: D:\git\Z33Screeps\src\prototypes\creep.js **********/
-/********** Start module 11: D:\git\Z33Screeps\src\prototypes\roomPosition.js **********/
+/********** End of module 10: C:\Users\zcupe\Documents\Programming\Z33Screeps\src\prototypes\creep.js **********/
+/********** Start module 11: C:\Users\zcupe\Documents\Programming\Z33Screeps\src\prototypes\roomPosition.js **********/
 __modules[11] = function(module, exports) {
 RoomPosition.prototype.getNearbyPositions = function getNearbyPositions(range){
 	var positions = [];
@@ -654,13 +666,13 @@ RoomPosition.prototype.getOpenPositions = function getOpenPositions(range){
 }
 return module.exports;
 }
-/********** End of module 11: D:\git\Z33Screeps\src\prototypes\roomPosition.js **********/
-/********** Start module 12: D:\git\Z33Screeps\dist\main.js **********/
+/********** End of module 11: C:\Users\zcupe\Documents\Programming\Z33Screeps\src\prototypes\roomPosition.js **********/
+/********** Start module 12: C:\Users\zcupe\Documents\Programming\Z33Screeps\dist\main.js **********/
 __modules[12] = function(module, exports) {
 
 return module.exports;
 }
-/********** End of module 12: D:\git\Z33Screeps\dist\main.js **********/
+/********** End of module 12: C:\Users\zcupe\Documents\Programming\Z33Screeps\dist\main.js **********/
 /********** Footer **********/
 if(typeof module === "object")
 	module.exports = __require(0);
