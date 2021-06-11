@@ -49,13 +49,15 @@ Creep.prototype.getEnergy = function getEnergy(){
 			break;
 		default: 
 			//Set our memory source if we need
-			if (this.memory.source == false) {
+			if (this.memory.source == false || this.memory.source == null) {
 				this.findEnergyStructure();
 				break;
 			}
 			gameObj = Game.getObjectById(this.memory.source);
 			// Make sure we can get energy from here
-			if (gameObj.energyCapacityAvaliable < this.store.getFreeCapacity([RESOURCE_ENERGY])){
+			console.log(gameObj);
+			if (gameObj.energyCapacity != null){ console.log('this is a source, not sturcture'); }
+			else if (gameObj.energyCapacityAvaliable < this.store.getFreeCapacity([RESOURCE_ENERGY])){
 				this.findEnergyStructure();
 				break;
 			}
@@ -76,13 +78,18 @@ Creep.prototype.getEnergy = function getEnergy(){
 // Find us an energy source
 Creep.prototype.findEnergySource = function findEnergySource(){
 	let sources = this.room.find(FIND_SOURCES_ACTIVE);
-	if (sources.length){
-		let source = _.find(sources, function(s){
+	let source = this.pos.findClosestByRange(sources);
+	if (source == undefined) {
+		source = _.find(sources, function(s){
 			return s.pos.getOpenPositions(1).length > 0;
 		});
-		if (source) {
+		if (source != undefined) {
 			this.memory.source = source.id;
+		} else {
+			return;
 		}
+	} else {
+		this.memory.source = source.id
 	}
 }
 
