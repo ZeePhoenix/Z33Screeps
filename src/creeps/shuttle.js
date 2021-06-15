@@ -6,7 +6,7 @@ var shuttle = {
     run: function(creep){
 		// If we are dropping off Energy and empty, go Mine
 		if (creep.memory.working && creep.store.getUsedCapacity([RESOURCE_ENERGY]) == 0){
-			creep.memory.working = false;
+			//creep.memory.working = false;
 			creep.memory.source = false;
 		}
 		// If we are Filling up on Energy and full, go work
@@ -41,10 +41,6 @@ var shuttle = {
 			creep.getEnergy();
 			return;
 		}
-
-		if (!creep.memory.working){
-			creep.memory.working = true;
-		}
 	},
     // checks if the room needs to spawn a creep
     spawn: function(room) {
@@ -61,7 +57,7 @@ var shuttle = {
             let name = 'Shuttle' + Game.time;
             var bodySegment = [CARRY, MOVE];
 			var body = this.getBody(bodySegment, room);
-            let memory = {role: 'shuttle', working: false, destination: false, source: false};
+            let memory = {role: 'shuttle', working: true, destination: false, source: false};
             return {name, body, memory};
     },
 
