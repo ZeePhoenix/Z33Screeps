@@ -12,7 +12,7 @@ module.exports.loop = function () {
 		_.forEach(Game.myRooms, r => roomLogic.spawning(r));
 	}
 
-	if (Game.time % 100 == 0) {
+	if (Game.time % 50 == 0) {
 		console.log('Finding Room Sources')
 		_.forEach(Game.myRooms, r => roomLogic.identifySources(r));
 	}
