@@ -228,10 +228,8 @@ var roleMiner = {
     run: function(creep){
 		if (!creep.memory.destination && !creep.memory.source){
 			var containers = _.filter(creep.room.find(FIND_STRUCTURES), (s) => s.structureType == STRUCTURE_CONTAINER);
-			let miners = _.filter(Game.creeps, (c) => c.memory.role == 'miner' && c.my);
-			let sources = creep.room.find(FIND_SOURCES);
 			_.forEach(containers, function(c){
-				if (!c.pos.lookFor(LOOK_CREEPS)){
+				if (!c.pos.lookFor(LOOK_CREEPS).length){
 					creep.memory.destination = c.id;
 					creep.memory.source = c.pos.findClosestByRange(FIND_SOURCES).id;
 				}
@@ -668,7 +666,7 @@ Creep.prototype.getEnergy = function getEnergy(){
 			}
 			break;
 		default: 
-			if (this.memory.source == false || this.memory.source == null) {
+			if (this.memory.source == false || this.memory.source == null || this.memory.source == undefined) {
 				this.findEnergyStructure();
 				break;
 			}
