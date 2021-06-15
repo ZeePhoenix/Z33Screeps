@@ -229,14 +229,11 @@ var roleMiner = {
 		if (!creep.memory.destination && !creep.memory.source){
 			var containers = _.filter(creep.room.find(FIND_STRUCTURES), (s) => s.structureType == STRUCTURE_CONTAINER);
 			let miners = _.filter(Game.creeps, (c) => c.memory.role == 'miner' && c.my);
-			let currentRoom = creep.room.name;
 			let sources = creep.room.find(FIND_SOURCES);
-			_.forEach(miners, function(m){
-				for(let c of containers){
-					if (m.pos != c.pos && m.pos == creep.pos){
-						creep.memory.destination = c.id;
-						creep.memory.source = c.pos.findClosestByRange(sources).id;
-					}
+			_.forEach(containers, function(c){
+				if (!c.pos.lookFor(LOOK_CREEPS)){
+					creep.memory.destination = c.id;
+					creep.memory.source = c.pos.findClosestByRange(FIND_SOURCES).id;
 				}
 			});
 		}
@@ -260,7 +257,7 @@ var roleMiner = {
 		console.log('Containers: '+ containers.length, room.name);
 
         if (miners.length < containers.length) {
-			console.log('need miner');
+			console.log('Need Miner');
             return true;
         }
     },
@@ -268,7 +265,7 @@ var roleMiner = {
             let name = 'Miner' + Game.time;
             var bodySegment = [WORK];
 			var body = this.getBody(bodySegment, room);
-			body.push(CARRY, MOVE);
+			if (body == 0) { return;}
             let memory = {role: 'miner', working: false, destination: false, source: false};
             return {name, body, memory};
     },
@@ -276,10 +273,13 @@ var roleMiner = {
 		var body = [];
 		let segmentCost = _.sum(segment, s => BODYPART_COST[s]);
 		let miners = _.filter(room.creeps, (c) => c.my && c.memory.role == 'miner');
+		body.push(CARRY);
+		body.push(MOVE);
 		let maxSegments = Math.floor((room.energyAvailable - 100) / segmentCost);
 		if (miners.length >= 1){
 			maxSegments = Math.floor((room.energyCapacityAvailable - 100)/segmentCost);
 		}
+		if (maxSegments < 1) {return 0;}
 		_.times(maxSegments, function(){
 			_.forEach(segment, s => body.push(s));
 		});
@@ -298,11 +298,29 @@ var shuttle = {
 
     /** @param {Creep} creep **/
     run: function(creep){
+		if (!creep.memory.working && creep.store.getFreeCapacity(RESOURCE_ENERGY) > 0){
+			let sources = _.filter(creep.room.find(FIND_STRUCTURES), (s) => s.structureType == STRUCTURE_CONTAINER && s.store.getUsedCapacity(RESOURCE_ENERGY) >= 50);
+			console.log(JSON.stringify(sources));
+			if (sources.length == 1){
+				creep.memory.source = sources[0].id;
+			} else if (sources.length == 0){
+			} else {
+				let largest = 0;
+				let amt = -1;
+				_.forEach(sources, function(s){
+					if (s.store.getUsedCapacity([RESOURCE_ENERGY]) > amt){
+						largest = sources.findIndex(s);
+						amt = s.store.getUsedCapacity([RESOURCE_ENERGY]);
+					}	
+				});
+				creep.memory.source = sources[largest].id;
+			}
+		}
 		if (creep.memory.working && creep.store.getUsedCapacity([RESOURCE_ENERGY]) == 0){
 			creep.memory.working = false;
 			creep.memory.source = false;
 		}
-		if (!creep.memory.working && creep.store.getFreeCapacity({RESOURCE_ENERGY}) == 0){
+		if (!creep.memory.working && creep.store.getFreeCapacity([RESOURCE_ENERGY]) < 50){
 			creep.memory.working = true;
 			creep.memory.destination = false;
 		}
@@ -331,10 +349,6 @@ var shuttle = {
 			creep.getEnergy();
 			return;
 		}
-
-		if (!creep.memory.working){
-			creep.memory.working = true;
-		}
 	},
     spawn: function(room) {
         var shuttles = _.filter(Game.creeps, (creep) => creep.memory.role == 'shuttle' && creep.room.name == room.name);
@@ -349,7 +363,7 @@ var shuttle = {
             let name = 'Shuttle' + Game.time;
             var bodySegment = [CARRY, MOVE];
 			var body = this.getBody(bodySegment, room);
-            let memory = {role: 'shuttle', working: false, destination: false, source: false};
+            let memory = {role: 'shuttle', working: true, destination: false, source: false};
             return {name, body, memory};
     },
 

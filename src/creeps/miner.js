@@ -9,15 +9,12 @@ var roleMiner = {
 		if (!creep.memory.destination && !creep.memory.source){
 			var containers = _.filter(creep.room.find(FIND_STRUCTURES), (s) => s.structureType == STRUCTURE_CONTAINER);
 			let miners = _.filter(Game.creeps, (c) => c.memory.role == 'miner' && c.my);
-			let currentRoom = creep.room.name;
 			let sources = creep.room.find(FIND_SOURCES);
 			//console.log(JSON.stringify(sources));
-			_.forEach(miners, function(m){
-				for(let c of containers){
-					if (m.pos != c.pos && m.pos == creep.pos){
-						creep.memory.destination = c.id;
-						creep.memory.source = c.pos.findClosestByRange(sources).id;
-					}
+			_.forEach(containers, function(c){
+				if (!c.pos.lookFor(LOOK_CREEPS)){
+					creep.memory.destination = c.id;
+					creep.memory.source = c.pos.findClosestByRange(FIND_SOURCES).id;
 				}
 			});
 		}
@@ -44,7 +41,7 @@ var roleMiner = {
 		console.log('Containers: '+ containers.length, room.name);
 
         if (miners.length < containers.length) {
-			console.log('need miner');
+			console.log('Need Miner');
             return true;
         }
     },
@@ -53,7 +50,7 @@ var roleMiner = {
             let name = 'Miner' + Game.time;
             var bodySegment = [WORK];
 			var body = this.getBody(bodySegment, room);
-			body.push(CARRY, MOVE);
+			if (body == 0) { return;}
             let memory = {role: 'miner', working: false, destination: false, source: false};
             return {name, body, memory};
     },
@@ -62,10 +59,13 @@ var roleMiner = {
 		var body = [];
 		let segmentCost = _.sum(segment, s => BODYPART_COST[s]);
 		let miners = _.filter(room.creeps, (c) => c.my && c.memory.role == 'miner');
+		body.push(CARRY);
+		body.push(MOVE);
 		let maxSegments = Math.floor((room.energyAvailable - 100) / segmentCost);
 		if (miners.length >= 1){
 			maxSegments = Math.floor((room.energyCapacityAvailable - 100)/segmentCost);
 		}
+		if (maxSegments < 1) {return 0;}
 		_.times(maxSegments, function(){
 			_.forEach(segment, s => body.push(s));
 		});

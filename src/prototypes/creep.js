@@ -50,7 +50,7 @@ Creep.prototype.getEnergy = function getEnergy(){
 			break;
 		default: 
 			//Set our memory source if we need
-			if (this.memory.source == false || this.memory.source == null) {
+			if (this.memory.source == false || this.memory.source == null || this.memory.source == undefined) {
 				this.findEnergyStructure();
 				break;
 			}

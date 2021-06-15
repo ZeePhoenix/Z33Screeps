@@ -4,13 +4,34 @@ var shuttle = {
 
     /** @param {Creep} creep **/
     run: function(creep){
+		if (!creep.memory.working && creep.store.getFreeCapacity(RESOURCE_ENERGY) > 0){
+			//creep.getEnergy();
+			let sources = _.filter(creep.room.find(FIND_STRUCTURES), (s) => s.structureType == STRUCTURE_CONTAINER && s.store.getUsedCapacity(RESOURCE_ENERGY) >= 50);
+			console.log(JSON.stringify(sources));
+			if (sources.length == 1){
+				creep.memory.source = sources[0].id;
+			} else if (sources.length == 0){
+				//return;
+			} else {
+				let largest = 0;
+				let amt = -1;
+				_.forEach(sources, function(s){
+					if (s.store.getUsedCapacity([RESOURCE_ENERGY]) > amt){
+						largest = sources.findIndex(s);
+						amt = s.store.getUsedCapacity([RESOURCE_ENERGY]);
+					}	
+				});
+				creep.memory.source = sources[largest].id;
+			}
+		}
+
 		// If we are dropping off Energy and empty, go Mine
 		if (creep.memory.working && creep.store.getUsedCapacity([RESOURCE_ENERGY]) == 0){
-			//creep.memory.working = false;
+			creep.memory.working = false;
 			creep.memory.source = false;
 		}
 		// If we are Filling up on Energy and full, go work
-		if (!creep.memory.working && creep.store.getFreeCapacity({RESOURCE_ENERGY}) == 0){
+		if (!creep.memory.working && creep.store.getFreeCapacity([RESOURCE_ENERGY]) < 50){
 			creep.memory.working = true;
 			creep.memory.destination = false;
 		}
